@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Квесты - Лаборатория робототехники{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">🎯 Квесты и обучение</h1>
+
+<div class="quests-container">
+    <!-- Квест 1 -->
+    <div class="card quest-card">
+        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <div class="quest-icon" style="background: #4CAF50;">🖨️</div>
+            <div style="flex: 1;">
+                <h2 style="margin: 0;">Основы 3D-печати</h2>
+                <p style="margin: 0; color: #666;">Изучите принципы работы 3D-принтера и создайте свою первую модель</p>
+            </div>
+            <span class="status-badge completed">Завершено</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress" style="width: 100%;"></div>
+        </div>
+        <div style="margin-top: 1rem;">
+            <strong>Награды:</strong>
+            <ul style="margin: 0.5rem 0 0 1rem; color: #666;">
+                <li>Допуск к 3D-принтерам</li>
+                <li>+100 опыта</li>
+            </ul>
+        </div>
+        <a href="/quest/1" class="btn btn-primary" style="margin-top: 1rem; text-decoration: none; display: inline-block;">
+            Просмотреть
+        </a>
+    </div>
+
+    <!-- Квест 2 -->
+    <div class="card quest-card">
+        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <div class="quest-icon" style="background: #2196F3;">🤖</div>
+            <div style="flex: 1;">
+                <h2 style="margin: 0;">Программирование роботов</h2>
+                <p style="margin: 0; color: #666;">Освойте базовые команды для роботов-манипуляторов</p>
+            </div>
+            <span class="status-badge in-progress">В процессе</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress" style="width: 75%;"></div>
+        </div>
+        <div style="margin-top: 1rem;">
+            <strong>Награды:</strong>
+            <ul style="margin: 0.5rem 0 0 1rem; color: #666;">
+                <li>Допуск к роботам-манипуляторам</li>
+                <li>+150 опыта</li>
+            </ul>
+        </div>
+        <a href="/quest/2" class="btn btn-primary" style="margin-top: 1rem; text-decoration: none; display: inline-block;">
+            Продолжить обучение
+        </a>
+    </div>
+
+    <!-- Квест 3 -->
+    <div class="card quest-card">
+        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <div class="quest-icon" style="background: #FF9800;">⚙️</div>
+            <div style="flex: 1;">
+                <h2 style="margin: 0;">Работа с ЧПУ станками</h2>
+                <p style="margin: 0; color: #666;">Научитесь создавать программы для ЧПУ обработки</p>
+            </div>
+            <span class="status-badge in-progress">В процессе</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress" style="width: 30%;"></div>
+        </div>
+        <div style="margin-top: 1rem;">
+            <strong>Награды:</strong>
+            <ul style="margin: 0.5rem 0 0 1rem; color: #666;">
+                <li>Допуск к ЧПУ станкам</li>
+                <li>+200 опыта</li>
+            </ul>
+        </div>
+        <a href="/quest/3" class="btn btn-primary" style="margin-top: 1rem; text-decoration: none; display: inline-block;">
+            Продолжить обучение
+        </a>
+    </div>
+
+    <!-- Квест 4 -->
+    <div class="card quest-card">
+        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <div class="quest-icon" style="background: #9C27B0;">🚁</div>
+            <div style="flex: 1;">
+                <h2 style="margin: 0;">Управление БПЛА</h2>
+                <p style="margin: 0; color: #666;">Освойте пилотирование беспилотных летательных аппаратов</p>
+            </div>
+            <span class="status-badge not-started">Не начат</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress" style="width: 0%;"></div>
+        </div>
+        <div style="margin-top: 1rem;">
+            <strong>Награды:</strong>
+            <ul style="margin: 0.5rem 0 0 1rem; color: #666;">
+                <li>Допуск к БПЛА</li>
+                <li>+180 опыта</li>
+            </ul>
+        </div>
+        <a href="/quest/4" class="btn btn-primary" style="margin-top: 1rem; text-decoration: none; display: inline-block;">
+            Начать обучение
+        </a>
+    </div>
+</div>
+
+<style>
+.quests-container {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.quest-card {
+    padding: 1.5rem;
+}
+
+.quest-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+}
+
+.progress-bar {
+    background: #e0e0e0;
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress {
+    background: #4CAF50;
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.completed {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.status-badge.in-progress {
+    background: #E3F2FD;
+    color: #1565C0;
+}
+
+.status-badge.not-started {
+    background: #F5F5F5;
+    color: #616161;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-family: inherit;
+    text-align: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+</style>
+{% endblock %}

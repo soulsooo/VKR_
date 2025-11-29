@@ -1,0 +1,842 @@
+{% extends "base.html" %}
+
+{% block title %}Все бронирования - Админ-панель{% endblock %}
+
+{% block extra_css %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<style>
+    .fc { font-size: 14px; }
+    .fc-event { cursor: pointer; }
+    .fc-event.confirmed { background: #28a745; border-color: #28a745; }
+    .fc-event.pending { background: #ffc107; border-color: #ffc107; color: #000; }
+    .fc-event.rejected { background: #dc3545; border-color: #dc3545; }
+    .fc-event.completed { background: #17a2b8; border-color: #17a2b8; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="admin-header">
+        <h1>📅 Управление бронированиями</h1>
+        <p>Интерактивный календарь и управление всеми бронированиями системы</p>
+    </div>
+
+    <!-- Переключение между видами -->
+    <div class="view-toggle">
+        <button class="btn btn-outline active" data-view="calendar">🗓️ Календарь</button>
+        <button class="btn btn-outline" data-view="list">📋 Список</button>
+    </div>
+
+    <!-- Календарь -->
+    <div id="calendar-view" class="view-content active">
+        <div class="card">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- Список -->
+    <div id="list-view" class="view-content">
+        <!-- Статистика бронирований -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ bookings|length }}</div>
+                <div class="stat-label">Всего бронирований</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+                <div class="stat-label">Ожидают подтверждения</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'confirmed')|list|length }}</div>
+                <div class="stat-label">Подтвержденные</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'completed')|list|length }}</div>
+                <div class="stat-label">Завершенные</div>
+            </div>
+        </div>
+
+        <!-- Умные фильтры -->
+        <div class="card">
+            <h3>🔍 Умные фильтры</h3>
+            <div class="smart-filters">
+                <button class="filter-btn active" data-filter="all">Все брони</button>
+                <button class="filter-btn" data-filter="today">📅 Сегодня</button>
+                <button class="filter-btn" data-filter="pending">⏳ Ожидают</button>
+                <button class="filter-btn" data-filter="conflict">⚠️ Конфликты</button>
+                <button class="filter-btn" data-filter="long">⏰ Долгие (>4ч)</button>
+            </div>
+        </div>
+
+        <!-- Массовые операции -->
+        <div class="card">
+            <h3>⚡ Групповые операции</h3>
+            <div class="bulk-actions">
+                <select class="bulk-action-select" id="bulkActionSelect">
+                    <option value="">Выберите действие...</option>
+                    <option value="confirm">✅ Подтвердить выделенные</option>
+                    <option value="reject">❌ Отклонить выделенные</option>
+                    <option value="complete">📦 Завершить выделенные</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="applyBulkAction()">Применить</button>
+                <span class="selected-count">Выбрано: <span id="selectedCount">0</span></span>
+            </div>
+        </div>
+
+        <!-- Список бронирований -->
+        <div class="card">
+            <h2>📋 Список бронирований</h2>
+            
+            <div class="bookings-list">
+                {% for booking in bookings %}
+                <div class="booking-item {{ booking.status }}" data-booking-id="{{ booking.id }}">
+                    <div class="booking-checkbox">
+                        <input type="checkbox" class="booking-select" onchange="updateSelection()">
+                    </div>
+                    <div class="booking-main">
+                        <div class="booking-equipment">
+                            <strong>{{ booking.equipment.name }}</strong>
+                            <span class="category">Категория: {{ booking.equipment.category.name }}</span>
+                        </div>
+                        
+                        <div class="booking-dates">
+                            <div class="booking-time">
+                                <span class="label">📅 Дата:</span>
+                                {{ booking.start_date.strftime('%d.%m.%Y') }}
+                            </div>
+                            <div class="booking-time">
+                                <span class="label">⏰ Время:</span>
+                                {{ booking.start_date.strftime('%H:%M') }} - {{ booking.end_date.strftime('%H:%M') }}
+                            </div>
+                        </div>
+                        
+                        <div class="booking-user">
+                            <div class="user-info">
+                                <span class="label">👤 Пользователь:</span>
+                                {{ booking.user.username }} ({{ booking.user.email }})
+                            </div>
+                        </div>
+                        
+                        <div class="booking-purpose">
+                            <span class="label">🎯 Цель:</span>
+                            {{ booking.purpose }}
+                        </div>
+                        
+                        <div class="booking-meta">
+                            <span class="created">Создано: {{ booking.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="booking-actions">
+                        <div class="status-badge {{ booking.status }}">
+                            {% if booking.status == 'pending' %}⏳ Ожидание
+                            {% elif booking.status == 'confirmed' %}✅ Подтверждено
+                            {% elif booking.status == 'rejected' %}❌ Отклонено
+                            {% elif booking.status == 'completed' %}📦 Завершено
+                            {% endif %}
+                        </div>
+                        
+                        {% if booking.status == 'pending' %}
+                        <form action="{{ url_for('admin_confirm_booking', booking_id=booking.id) }}" method="POST" class="status-form">
+                            <button type="submit" class="btn btn-success btn-sm">✅ Подтвердить</button>
+                            <button type="submit" formaction="{{ url_for('admin_reject_booking', booking_id=booking.id) }}" class="btn btn-danger btn-sm">❌ Отклонить</button>
+                        </form>
+                        {% elif booking.status == 'confirmed' %}
+                        <form action="{{ url_for('admin_reject_booking', booking_id=booking.id) }}" method="POST" class="status-form">
+                            <button type="submit" name="status" value="completed" class="btn btn-info btn-sm">📦 Завершить</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="no-bookings">
+                    <p>Бронирования не найдены</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для деталей бронирования -->
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>📅 Детали бронирования</h3>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<style>
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.admin-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.admin-header h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 2.5rem;
+}
+
+.admin-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Переключение видов */
+.view-toggle {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+}
+
+.view-toggle .btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #667eea;
+    background: transparent;
+    color: #667eea;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-toggle .btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.view-content {
+    display: none;
+}
+
+.view-content.active {
+    display: block;
+}
+
+/* Календарь */
+#calendar {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+/* Умные фильтры */
+.smart-filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #e9ecef;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.filter-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.filter-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Массовые операции */
+.bulk-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.bulk-action-select {
+    padding: 0.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    min-width: 200px;
+}
+
+.selected-count {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Список бронирований */
+.bookings-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.booking-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+}
+
+.booking-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.booking-checkbox {
+    padding-top: 0.25rem;
+}
+
+.booking-checkbox input[type="checkbox"] {
+    transform: scale(1.2);
+}
+
+.booking-main {
+    flex: 1;
+}
+
+.booking-equipment {
+    margin-bottom: 1rem;
+}
+
+.booking-equipment strong {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.category {
+    color: #667eea;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.booking-dates {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.booking-time {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.booking-user {
+    margin-bottom: 1rem;
+}
+
+.user-info {
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.booking-purpose {
+    margin-bottom: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.booking-meta {
+    margin-top: 1rem;
+}
+
+.created {
+    color: #888;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.booking-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-end;
+    min-width: 150px;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-badge.confirmed {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.rejected {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-badge.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.status-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #138496;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+}
+
+.no-bookings {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+}
+
+.close:hover {
+    color: #000;
+}
+
+/* Статистика */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+    
+    .booking-item {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .booking-actions {
+        width: 100%;
+        align-items: stretch;
+    }
+    
+    .status-form {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .booking-dates {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .bulk-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .smart-filters {
+        justify-content: center;
+    }
+    
+    .admin-header h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .view-toggle {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ru.js'></script>
+<script>
+// Глобальные переменные
+let calendar;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация календаря
+    const calendarEl = document.getElementById('calendar');
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'ru',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: [
+            {% for booking in bookings %}
+            {
+                id: '{{ booking.id }}',
+                title: '{{ booking.equipment.name }} - {{ booking.user.username }}',
+                start: '{{ booking.start_date.strftime("%Y-%m-%dT%H:%M:%S") }}',
+                end: '{{ booking.end_date.strftime("%Y-%m-%dT%H:%M:%S") }}',
+                className: '{{ booking.status }}',
+                extendedProps: {
+                    user: '{{ booking.user.username }}',
+                    email: '{{ booking.user.email }}',
+                    purpose: '{{ booking.purpose }}',
+                    status: '{{ booking.status }}',
+                    equipment: '{{ booking.equipment.name }}',
+                    category: '{{ booking.equipment.category.name }}'
+                }
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ],
+        eventClick: function(info) {
+            showBookingDetails(info.event);
+        },
+        eventDisplay: 'block',
+        eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            meridiem: false
+        }
+    });
+    calendar.render();
+
+    // Переключение между видами
+    document.querySelectorAll('.view-toggle .btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const view = this.dataset.view;
+            
+            // Обновляем активные кнопки
+            document.querySelectorAll('.view-toggle .btn').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Показываем соответствующий вид
+            document.querySelectorAll('.view-content').forEach(function(content) {
+                content.classList.remove('active');
+            });
+            document.getElementById(view + '-view').classList.add('active');
+        });
+    });
+
+    // Умные фильтры
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            const filter = this.dataset.filter;
+            filterBookings(filter);
+        });
+    });
+
+    // Модальное окно
+    const modal = document.getElementById('bookingModal');
+    const span = document.getElementsByClassName('close')[0];
+
+    if (span) {
+        span.onclick = function() {
+            modal.style.display = 'none';
+        };
+    }
+
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+});
+
+// Функция для показа деталей бронирования
+function showBookingDetails(event) {
+    const modal = document.getElementById('bookingModal');
+    const modalContent = document.getElementById('modalContent');
+    
+    const props = event.extendedProps;
+    const start = event.startStr;
+    const end = event.endStr;
+    
+    modalContent.innerHTML = `
+        <div class="booking-details">
+            <p><strong>Оборудование:</strong> ${props.equipment}</p>
+            <p><strong>Категория:</strong> ${props.category}</p>
+            <p><strong>Пользователь:</strong> ${props.user} (${props.email})</p>
+            <p><strong>Время:</strong> ${new Date(start).toLocaleString()} - ${new Date(end).toLocaleString()}</p>
+            <p><strong>Статус:</strong> ${getStatusText(props.status)}</p>
+            <p><strong>Цель:</strong> ${props.purpose}</p>
+            <div class="modal-actions">
+                ${props.status === 'pending' ? `
+                    <form action="/admin/bookings/${event.id}/confirm" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-success">✅ Подтвердить</button>
+                    </form>
+                    <form action="/admin/bookings/${event.id}/reject" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">❌ Отклонить</button>
+                    </form>
+                ` : ''}
+                ${props.status === 'confirmed' ? `
+                    <form action="/admin/bookings/${event.id}/reject" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-info">📦 Завершить</button>
+                    </form>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    modal.style.display = 'block';
+}
+
+// Функция для получения текста статуса
+function getStatusText(status) {
+    const statusMap = {
+        'pending': '⏳ Ожидание',
+        'confirmed': '✅ Подтверждено',
+        'rejected': '❌ Отклонено',
+        'completed': '📦 Завершено'
+    };
+    return statusMap[status] || status;
+}
+
+// Функция фильтрации бронирований
+function filterBookings(filter) {
+    const items = document.querySelectorAll('.booking-item');
+    
+    items.forEach(function(item) {
+        let show = true;
+        
+        switch(filter) {
+            case 'today':
+                const today = new Date().toDateString();
+                const dateElement = item.querySelector('.booking-time');
+                if (dateElement) {
+                    const itemDateText = dateElement.textContent.split(': ')[1];
+                    const itemDate = new Date(itemDateText.split('.').reverse().join('-')).toDateString();
+                    show = today === itemDate;
+                }
+                break;
+            case 'pending':
+                show = item.classList.contains('pending');
+                break;
+            case 'conflict':
+                // Простая проверка конфликтов
+                const statusBadge = item.querySelector('.status-badge');
+                show = statusBadge && statusBadge.textContent.includes('Конфликт');
+                break;
+            case 'long':
+                const timeElements = item.querySelectorAll('.booking-time');
+                if (timeElements.length > 1) {
+                    const timeText = timeElements[1].textContent;
+                    const timeParts = timeText.split(' - ');
+                    if (timeParts.length === 2) {
+                        const startTime = timeParts[0].split(': ')[1];
+                        const endTime = timeParts[1];
+                        const start = new Date('2000-01-01 ' + startTime);
+                        const end = new Date('2000-01-01 ' + endTime);
+                        const duration = end - start;
+                        show = duration > 4 * 60 * 60 * 1000; // Более 4 часов
+                    }
+                }
+                break;
+            case 'all':
+            default:
+                show = true;
+                break;
+        }
+        
+        item.style.display = show ? 'flex' : 'none';
+    });
+}
+
+// Функция обновления счетчика выбранных элементов
+function updateSelection() {
+    const selected = document.querySelectorAll('.booking-select:checked').length;
+    document.getElementById('selectedCount').textContent = selected;
+}
+
+// Функция применения массовых действий
+function applyBulkAction() {
+    const select = document.getElementById('bulkActionSelect');
+    const action = select.value;
+    const selectedIds = Array.from(document.querySelectorAll('.booking-select:checked'))
+        .map(function(checkbox) {
+            return checkbox.closest('.booking-item').dataset.bookingId;
+        });
+    
+    if (!action) {
+        alert('Выберите действие');
+        return;
+    }
+    
+    if (selectedIds.length === 0) {
+        alert('Выберите хотя бы одно бронирование');
+        return;
+    }
+    
+    if (confirm('Применить действие "' + select.options[select.selectedIndex].text + '" к ' + selectedIds.length + ' бронированиям?')) {
+        // Временное решение - перезагрузка страницы
+        // В будущем можно сделать AJAX запросы
+        selectedIds.forEach(function(id) {
+            console.log('Applying action', action, 'to booking', id);
+        });
+        location.reload();
+    }
+}
+</script>
+{% endblock %}

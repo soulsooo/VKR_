@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.name }} - Лаборатория робототехники{% endblock %}
+
+{% block content %}
+<div class="equipment-detail">
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumb-nav">
+        <a href="/">Главная</a> &gt;
+        <a href="/equipment">Оборудование</a> &gt;
+        <span>{{ item.name }}</span>
+    </nav>
+
+    <div class="detail-container">
+        <!-- Основная информация -->
+        <div class="detail-main">
+            <div class="image-section">
+                {% if item.image_url %}
+                    <img src="{{ url_for('static', filename=item.image_url) }}" class="equipment-image" alt="{{ item.name }}">
+                {% else %}
+                    <div class="image-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <span>Фото оборудования</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="info-section">
+                <div class="equipment-header">
+                    <h1>{{ item.name }}</h1>
+                    <div class="status-badge {% if item.is_available %}available{% else %}unavailable{% endif %}">
+                        <i class="fas {% if item.is_available %}fa-check-circle{% else %}fa-times-circle{% endif %}"></i>
+                        {% if item.is_available %}Доступно{% else %}Недоступно{% endif %}
+                    </div>
+                </div>
+                
+                <p class="equipment-description">{{ item.description }}</p>
+                
+                <div class="quick-specs">
+                    <div class="spec-item">
+                        <i class="fas fa-tag"></i>
+                        <span>Категория:</span>
+                        <strong>{{ item.category.name if item.category else 'Общее' }}</strong>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Статус:</span>
+                        <strong>{% if item.is_available %}Свободно{% else %}Занято{% endif %}</strong>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    {% if item.is_available %}
+                    <a href="{{ url_for('booking') }}" class="btn btn-primary btn-book">
+                        <i class="fas fa-calendar-plus"></i>
+                        Забронировать
+                    </a>
+                    {% else %}
+                    <button class="btn btn-disabled" disabled>
+                        <i class="fas fa-clock"></i>
+                        Недоступно
+                    </button>
+                    {% endif %}
+                    <a href="/equipment" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i>
+                        Назад к каталогу
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Детальная информация -->
+        <div class="detail-tabs">
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab(event, 'specifications')">
+                    <i class="fas fa-list-alt"></i>
+                    Характеристики
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'requirements')">
+                    <i class="fas fa-clipboard-check"></i>
+                    Требования
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'usage')">
+                    <i class="fas fa-book"></i>
+                    Инструкция
+                </button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Характеристики -->
+                <div id="specifications" class="tab-pane active">
+                    <div class="specs-grid">
+                        <div class="spec-card">
+                            <h3><i class="fas fa-cogs"></i> Технические характеристики</h3>
+                            {% if item.specifications and item.specifications.strip() %}
+                                <div class="spec-text">{{ item.specifications|replace('\n', '<br>')|safe }}</div>
+                            {% else %}
+                                <div class="no-data">
+                                    <i class="fas fa-info-circle"></i>
+                                    <p>Характеристики не указаны</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Требования -->
+                <div id="requirements" class="tab-pane">
+                    <div class="requirements-card">
+                        <h3><i class="fas fa-user-check"></i> Требования к использованию</h3>
+                        {% if item.requirements and item.requirements.strip() %}
+                            <div class="requirements-text">{{ item.requirements|replace('\n', '<br>')|safe }}</div>
+                        {% else %}
+                            <div class="no-data">
+                                <i class="fas fa-info-circle"></i>
+                                <p>Требования не указаны</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Инструкция -->
+                <div id="usage" class="tab-pane">
+                    <div class="instruction-card">
+                        <h3><i class="fas fa-book-open"></i> Инструкция по использованию</h3>
+                        {% if item.usage_instructions and item.usage_instructions.strip() %}
+                            <div class="instruction-text">{{ item.usage_instructions|replace('\n', '<br>')|safe }}</div>
+                        {% else %}
+                            <div class="no-data">
+                                <i class="fas fa-info-circle"></i>
+                                <p>Инструкция не указана</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.equipment-detail {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.breadcrumb-nav {
+    margin-bottom: 30px;
+    color: #666;
+    font-size: 14px;
+}
+
+.breadcrumb-nav a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.breadcrumb-nav a:hover {
+    text-decoration: underline;
+}
+
+.detail-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.detail-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 40px;
+}
+
+.image-section {
+    position: relative;
+}
+
+.equipment-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 400px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    border: 2px dashed #ddd;
+}
+
+.image-placeholder i {
+    font-size: 48px;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+.info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.equipment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.equipment-header h1 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 28px;
+    line-height: 1.2;
+}
+
+.status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-badge.available {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.status-badge.unavailable {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.equipment-description {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+}
+
+.quick-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.spec-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.spec-item i {
+    color: #667eea;
+    width: 20px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #667eea;
+    color: #667eea;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.detail-tabs {
+    border-top: 1px solid #e9ecef;
+}
+
+.tabs {
+    display: flex;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab-button:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.tab-button.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+    background: white;
+}
+
+.tab-content {
+    padding: 30px 40px;
+    min-height: 300px;
+}
+
+.tab-pane {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.spec-card, .requirements-card, .instruction-card {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    border-left: 5px solid #667eea;
+}
+
+.spec-card h3, .requirements-card h3, .instruction-card h3 {
+    margin: 0 0 20px 0;
+    color: #2c3e50;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.spec-text, .requirements-text, .instruction-text {
+    line-height: 1.8;
+    color: #495057;
+    font-size: 15px;
+}
+
+.spec-text {
+    font-family: 'Courier New', monospace;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #e9ecef;
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.no-data i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.no-data p {
+    margin: 0;
+    font-size: 16px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .detail-main {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 30px;
+    }
+    
+    .tabs {
+        flex-direction: column;
+    }
+    
+    .tab-content {
+        padding: 20px;
+    }
+    
+    .equipment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .spec-card, .requirements-card, .instruction-card {
+        padding: 20px;
+    }
+}
+</style>
+
+<script>
+function openTab(event, tabName) {
+    // Скрыть все вкладки
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    tabPanes.forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Убрать активный класс у всех кнопок
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Показать выбранную вкладку
+    document.getElementById(tabName).classList.add('active');
+    
+    // Сделать кнопку активной
+    event.currentTarget.classList.add('active');
+}
+
+// Автоматически открываем первую вкладку при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    const firstTab = document.querySelector('.tab-button');
+    if (firstTab) {
+        firstTab.click();
+    }
+});
+</script>
+{% endblock %}

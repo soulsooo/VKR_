@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Тест по безопасности - Задание 2{% endblock %}
+
+{% block content %}
+<div class="task-container">
+    <div class="task-header">
+        <a href="/quest/1" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к квесту
+        </a>
+        <h1>Тест по безопасности</h1>
+        <span class="task-type-badge type-quiz">
+            <i class="fas fa-question"></i> Тест
+        </span>
+    </div>
+
+    <div class="card task-content">
+        <h2>Техника безопасности при работе с 3D-принтерами</h2>
+        
+        <div class="quiz-info">
+            <p><strong>Инструкция:</strong> Выберите правильные ответы на вопросы. Для успешного прохождения необходимо правильно ответить на все вопросы.</p>
+        </div>
+
+        <form id="safetyQuiz" class="quiz-form">
+            <!-- Вопрос 1 -->
+            <div class="quiz-question">
+                <h3>1. Что необходимо делать перед началом работы с 3D-принтером?</h3>
+                <div class="quiz-options">
+                    <label class="quiz-option">
+                        <input type="checkbox" name="q1" value="a">
+                        <span>Проверить наличие пластика в экструдере</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="checkbox" name="q1" value="b">
+                        <span>Убедиться в чистоте рабочей зоны</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="checkbox" name="q1" value="c">
+                        <span>Надеть защитные очки</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="checkbox" name="q1" value="d">
+                        <span>Проверить калибровку платформы</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Вопрос 2 -->
+            <div class="quiz-question">
+                <h3>2. Какие меры предосторожности необходимы при печати ABS пластиком?</h3>
+                <div class="quiz-options">
+                    <label class="quiz-option">
+                        <input type="radio" name="q2" value="a">
+                        <span>Работать в хорошо проветриваемом помещении</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q2" value="b">
+                        <span>Использовать вытяжку или вентиляцию</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q2" value="c">
+                        <span>Не находиться постоянно рядом с принтером</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q2" value="d">
+                        <span>Все вышеперечисленное</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Вопрос 3 -->
+            <div class="quiz-question">
+                <h3>3. Что запрещено делать во время работы 3D-принтера?</h3>
+                <div class="quiz-options">
+                    <label class="quiz-option">
+                        <input type="checkbox" name="q3" value="a">
+                        <span>Дотрагиваться до нагретых частей</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="checkbox" name="q3" value="b">
+                        <span>Резко выдергивать филамент</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="checkbox" name="q3" value="c">
+                        <span>Оставлять принтер без присмотра на долгое время</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="checkbox" name="q3" value="d">
+                        <span>Использовать неисправное оборудование</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Вопрос 4 -->
+            <div class="quiz-question">
+                <h3>4. При какой температуре нагревается экструдер при печати PLA?</h3>
+                <div class="quiz-options">
+                    <label class="quiz-option">
+                        <input type="radio" name="q4" value="a">
+                        <span>180-220°C</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q4" value="b">
+                        <span>100-150°C</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q4" value="c">
+                        <span>250-300°C</span>
+                    </label>
+                    <label class="quiz-option">
+                        <input type="radio" name="q4" value="d">
+                        <span>150-180°C</span>
+                    </label>
+                </div>
+            </div>
+        </form>
+
+        <div class="task-actions">
+            <button class="btn btn-primary" onclick="checkQuiz()">
+                <i class="fas fa-paper-plane"></i> Проверить ответы
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.task-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.task-header h1 {
+    margin: 0;
+    color: #333;
+}
+
+.task-type-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.type-quiz {
+    background: #E3F2FD;
+    color: #1565C0;
+}
+
+.quiz-info {
+    background: #e3f2fd;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border-left: 4px solid #2196F3;
+}
+
+.quiz-question {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.quiz-question h3 {
+    margin: 0 0 1rem 0;
+    color: #333;
+}
+
+.quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.quiz-option:hover {
+    background: #e9ecef;
+}
+
+.quiz-option input[type="radio"],
+.quiz-option input[type="checkbox"] {
+    margin: 0;
+}
+
+.task-actions {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+</style>
+
+<script>
+function checkQuiz() {
+    // Правильные ответы
+    const correctAnswers = {
+        q1: ['a', 'b', 'c', 'd'], // Все ответы правильные
+        q2: ['d'], // Все вышеперечисленное
+        q3: ['a', 'b', 'c', 'd'], // Все ответы правильные
+        q4: ['a'] // 180-220°C
+    };
+
+    let score = 0;
+    const totalQuestions = 4;
+
+    // Проверка вопроса 1 (multiple choice)
+    const q1Answers = Array.from(document.querySelectorAll('input[name="q1"]:checked'))
+        .map(input => input.value);
+    if (arraysEqual(q1Answers, correctAnswers.q1)) score++;
+
+    // Проверка вопроса 2 (single choice)
+    const q2Answer = document.querySelector('input[name="q2"]:checked');
+    if (q2Answer && correctAnswers.q2.includes(q2Answer.value)) score++;
+
+    // Проверка вопроса 3 (multiple choice)
+    const q3Answers = Array.from(document.querySelectorAll('input[name="q3"]:checked'))
+        .map(input => input.value);
+    if (arraysEqual(q3Answers, correctAnswers.q3)) score++;
+
+    // Проверка вопроса 4 (single choice)
+    const q4Answer = document.querySelector('input[name="q4"]:checked');
+    if (q4Answer && correctAnswers.q4.includes(q4Answer.value)) score++;
+
+    if (score === totalQuestions) {
+        alert('🎉 Поздравляем! Вы успешно прошли тест по безопасности!');
+        if (confirm('Отметить задание как завершенное?')) {
+            window.location.href = '/quest/1';
+        }
+    } else {
+        alert(`Вы ответили правильно на ${score} из ${totalQuestions} вопросов. Попробуйте еще раз!`);
+    }
+}
+
+function arraysEqual(a, b) {
+    if (a.length !== b.length) return false;
+    return a.every(value => b.includes(value));
+}
+</script>
+{% endblock %}

@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}Все бронирования - Админ-панель{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="admin-header">
+        <h1>📋 Все бронирования</h1>
+        <p>Управление бронированиями всех пользователей системы</p>
+    </div>
+
+    <!-- Статистика бронирований -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ bookings|length }}</div>
+            <div class="stat-label">Всего бронирований</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+            <div class="stat-label">Ожидают подтверждения</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'confirmed')|list|length }}</div>
+            <div class="stat-label">Подтвержденные</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ bookings|selectattr('status', 'equalto', 'completed')|list|length }}</div>
+            <div class="stat-label">Завершенные</div>
+        </div>
+    </div>
+
+    <!-- Список бронирований -->
+    <div class="card">
+        <h2>📅 Список бронирований</h2>
+        
+        <div class="bookings-list">
+            {% for booking in bookings %}
+            <div class="booking-item {{ booking.status }}">
+                <div class="booking-main">
+                    <div class="booking-equipment">
+                        <strong>{{ booking.equipment.name }}</strong>
+                        <span class="category">Категория: {{ booking.equipment.category.name }}</span>
+                    </div>
+                    
+                    <div class="booking-dates">
+                        <div class="booking-time">
+                            <span class="label">📅 Дата:</span>
+                            {{ booking.start_date.strftime('%d.%m.%Y') }}
+                        </div>
+                        <div class="booking-time">
+                            <span class="label">⏰ Время:</span>
+                            {{ booking.start_date.strftime('%H:%M') }} - {{ booking.end_date.strftime('%H:%M') }}
+                        </div>
+                    </div>
+                    
+                    <div class="booking-user">
+                        <div class="user-info">
+                            <span class="label">👤 Пользователь:</span>
+                            {{ booking.user.username }} ({{ booking.user.email }})
+                        </div>
+                    </div>
+                    
+                    <div class="booking-purpose">
+                        <span class="label">🎯 Цель:</span>
+                        {{ booking.purpose }}
+                    </div>
+                    
+                    <div class="booking-meta">
+                        <span class="created">Создано: {{ booking.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                    </div>
+                </div>
+                
+                <div class="booking-actions">
+                    <div class="status-badge {{ booking.status }}">
+                        {% if booking.status == 'pending' %}⏳ Ожидание
+                        {% elif booking.status == 'confirmed' %}✅ Подтверждено
+                        {% elif booking.status == 'rejected' %}❌ Отклонено
+                        {% elif booking.status == 'completed' %}📦 Завершено
+                        {% endif %}
+                    </div>
+                    
+                    {% if booking.status == 'pending' %}
+                    <form action="{{ url_for('admin_update_booking_status', booking_id=booking.id) }}" method="POST" class="status-form">
+                        <button type="submit" name="status" value="confirmed" class="btn btn-success btn-sm">✅ Подтвердить</button>
+                        <button type="submit" name="status" value="rejected" class="btn btn-danger btn-sm">❌ Отклонить</button>
+                    </form>
+                    {% elif booking.status == 'confirmed' %}
+                    <form action="{{ url_for('admin_update_booking_status', booking_id=booking.id) }}" method="POST" class="status-form">
+                        <button type="submit" name="status" value="completed" class="btn btn-info btn-sm">📦 Завершить</button>
+                        <button type="submit" name="status" value="rejected" class="btn btn-danger btn-sm">❌ Отклонить</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="no-bookings">
+                <p>Бронирования не найдены</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.admin-header h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.admin-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.bookings-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.booking-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+}
+
+.booking-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.booking-main {
+    flex: 1;
+}
+
+.booking-equipment {
+    margin-bottom: 1rem;
+}
+
+.booking-equipment strong {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.category {
+    color: #667eea;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.booking-dates {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.booking-time {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.booking-user {
+    margin-bottom: 1rem;
+}
+
+.user-info {
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.booking-purpose {
+    margin-bottom: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.booking-meta {
+    margin-top: 1rem;
+}
+
+.created {
+    color: #888;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.booking-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-end;
+    min-width: 150px;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-badge.confirmed {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.rejected {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-badge.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.status-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #138496;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.no-bookings {
+    text-align: center;
+    padding: 3rem;
+    color: #666;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .booking-item {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .booking-actions {
+        width: 100%;
+        align-items: stretch;
+    }
+    
+    .status-form {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .booking-dates {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+</style>
+{% endblock %}

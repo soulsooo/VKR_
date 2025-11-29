@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Подготовка модели - Задание 3{% endblock %}
+
+{% block content %}
+<div class="task-container">
+    <div class="task-header">
+        <a href="/quest/1" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к квесту
+        </a>
+        <h1>Подготовка модели</h1>
+        <span class="task-type-badge type-reading">
+            <i class="fas fa-book"></i> Чтение
+        </span>
+    </div>
+
+    <div class="card task-content">
+        <h2>Работа со слайсерами и подготовка G-кода</h2>
+        
+        <div class="reading-content">
+            <h3>Что такое слайсер?</h3>
+            <p>Слайсер - это программа, которая преобразует 3D-модель в инструкции (G-код) для 3D-принтера.</p>
+
+            <h3>Популярные слайсеры:</h3>
+            <div class="software-grid">
+                <div class="software-card">
+                    <h4>Ultimaker Cura</h4>
+                    <p>✅ Бесплатный<br>✅ Поддержка многих принтеров<br>✅ Простой интерфейс<br>✅ Автоматические настройки</p>
+                </div>
+                <div class="software-card">
+                    <h4>PrusaSlicer</h4>
+                    <p>✅ Бесплатный<br>✅ Отличное качество печати<br>✅ Поддержка Prusa принтеров<br>✅ Много продвинутых настроек</p>
+                </div>
+                <div class="software-card">
+                    <h4>Simplify3D</h4>
+                    <p>✅ Платный ($199)<br>✅ Высокая скорость работы<br>✅ Поддержка нескольких экструдеров<br>✅ Детальный контроль</p>
+                </div>
+            </div>
+
+            <h3>Основные настройки слайсера:</h3>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <h4>Высота слоя</h4>
+                    <p><strong>0.1-0.3 мм</strong><br>Меньше = лучше качество, дольше печать</p>
+                </div>
+                <div class="setting-item">
+                    <h4>Заполнение</h4>
+                    <p><strong>10-30%</strong><br>Прочность vs экономия материала</p>
+                </div>
+                <div class="setting-item">
+                    <h4>Скорость печати</h4>
+                    <p><strong>40-80 мм/с</strong><br>Баланс качества и скорости</p>
+                </div>
+                <div class="setting-item">
+                    <h4>Температура сопла</h4>
+                    <p><strong>PLA: 190-220°C</strong><br>Зависит от материала</p>
+                </div>
+                <div class="setting-item">
+                    <h4>Температура стола</h4>
+                    <p><strong>PLA: 50-70°C</strong><br>Для лучшей адгезии</p>
+                </div>
+                <div class="setting-item">
+                    <h4>Поддержки</h4>
+                    <p><strong>При угле >45°</strong><br>Для сложных моделей</p>
+                </div>
+            </div>
+
+            <h3>Процесс подготовки:</h3>
+            <ol>
+                <li><strong>Импорт модели</strong> - загрузка STL или OBJ файла</li>
+                <li><strong>Ориентация</strong> - оптимальное расположение на столе</li>
+                <li><strong>Масштабирование</strong> - установка нужного размера</li>
+                <li><strong>Настройки печати</strong> - выбор параметров</li>
+                <li><strong>Слайсинг</strong> - генерация G-кода</li>
+                <li><strong>Предпросмотр</strong> - проверка слоев</li>
+                <li><strong>Сохранение</strong> - запись на SD-карту</li>
+            </ol>
+
+            <h3>Распространенные ошибки:</h3>
+            <ul>
+                <li><strong>Плохая адгезия</strong> - неправильная температура стола</li>
+                <li><strong>Слоистость</strong> - большой шаг слоя</li>
+                <li><strong>Забитое сопло</strong> - неправильная температура</li>
+                <li><strong>Смещение слоев</li> - ослабленные ремни</li>
+                <li><strong>Недопечаток</strong> - малое заполнение</li>
+            </ul>
+        </div>
+
+        <div class="task-actions">
+            <button class="btn btn-success" onclick="completeTask(3)">
+                <i class="fas fa-check"></i> Отметить как прочитанное
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.task-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.task-header h1 {
+    margin: 0;
+    color: #333;
+}
+
+.task-type-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.type-reading {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.reading-content {
+    line-height: 1.6;
+}
+
+.reading-content h3 {
+    color: #333;
+    margin: 2rem 0 1rem 0;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 0.5rem;
+}
+
+.reading-content ul, .reading-content ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.reading-content li {
+    margin-bottom: 0.5rem;
+}
+
+.software-grid, .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.software-card, .setting-item {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #2196F3;
+}
+
+.software-card h4, .setting-item h4 {
+    margin: 0 0 1rem 0;
+    color: #1565C0;
+}
+
+.software-card p, .setting-item p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.setting-item {
+    border-left-color: #4CAF50;
+}
+
+.setting-item h4 {
+    color: #2E7D32;
+}
+
+.task-actions {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+</style>
+
+<script>
+function completeTask(taskNumber) {
+    if (confirm('Отметить это задание как завершенное?')) {
+        alert('Задание отмечено как завершенное!');
+        window.location.href = '/quest/1';
+    }
+}
+</script>
+{% endblock %}

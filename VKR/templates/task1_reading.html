@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Основы 3D-печати - Задание 1{% endblock %}
+
+{% block content %}
+<div class="task-container">
+    <div class="task-header">
+        <a href="/quest/1" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к квесту
+        </a>
+        <h1>Основы 3D-печати</h1>
+        <span class="task-type-badge type-reading">
+            <i class="fas fa-book"></i> Чтение
+        </span>
+    </div>
+
+    <div class="card task-content">
+        <h2>Технология FDM печати</h2>
+        
+        <div class="reading-content">
+            <h3>Что такое FDM 3D-печать?</h3>
+            <p>FDM (Fused Deposition Modeling) - это технология послойного наплавления, которая является самой распространенной в мире 3D-печати.</p>
+            
+            <h3>Основные принципы:</h3>
+            <ul>
+                <li><strong>Экструдер</strong> - плавит пластиковую нить (филамент)</li>
+                <li><strong>Платформа</strong> - поверхность, на которой происходит печать</li>
+                <li><strong>Слои</strong> - объект создается послойно снизу вверх</li>
+                <li><strong>Поддержки</strong> - временные структуры для сложных форм</li>
+            </ul>
+
+            <h3>Виды материалов:</h3>
+            <div class="materials-grid">
+                <div class="material-card">
+                    <h4>PLA (Polylactic Acid)</h4>
+                    <p>✅ Биоразлагаемый<br>✅ Легко печатать<br>✅ Низкая усадка<br>❌ Низкая термостойкость</p>
+                </div>
+                <div class="material-card">
+                    <h4>ABS (Acrylonitrile Butadiene Styrene)</h4>
+                    <p>✅ Прочный<br>✅ Термостойкий<br>❌ Требует подогреваемый стол<br>❌ Выделяет пары</p>
+                </div>
+                <div class="material-card">
+                    <h4>PETG (Polyethylene Terephthalate Glycol)</h4>
+                    <p>✅ Прочный и гибкий<br>✅ Водостойкий<br>✅ Хорошая адгезия<br>❌ Сложнее в настройке</p>
+                </div>
+            </div>
+
+            <h3>Процесс печати:</h3>
+            <ol>
+                <li>Создание 3D-модели в CAD-программе</li>
+                <li>Экспорт в формат STL</li>
+                <li>Подготовка в слайсере (нарезка на слои)</li>
+                <li>Сохранение G-кода</li>
+                <li>Загрузка на принтер и печать</li>
+                <li>Постобработка (удаление поддержек)</li>
+            </ol>
+        </div>
+
+        <div class="task-actions">
+            <button class="btn btn-success" onclick="completeTask(1)">
+                <i class="fas fa-check"></i> Отметить как прочитанное
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.task-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.task-header h1 {
+    margin: 0;
+    color: #333;
+}
+
+.task-type-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.type-reading {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.reading-content {
+    line-height: 1.6;
+}
+
+.reading-content h3 {
+    color: #333;
+    margin: 2rem 0 1rem 0;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 0.5rem;
+}
+
+.reading-content ul, .reading-content ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.reading-content li {
+    margin-bottom: 0.5rem;
+}
+
+.materials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.material-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #4CAF50;
+}
+
+.material-card h4 {
+    margin: 0 0 1rem 0;
+    color: #2E7D32;
+}
+
+.material-card p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.task-actions {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+</style>
+
+<script>
+function completeTask(taskNumber) {
+    if (confirm('Отметить это задание как завершенное?')) {
+        alert('Задание отмечено как завершенное!');
+        window.location.href = '/quest/1';
+    }
+}
+</script>
+{% endblock %}

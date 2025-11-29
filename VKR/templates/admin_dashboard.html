@@ -1,0 +1,395 @@
+{% extends "base.html" %}
+
+{% block title %}Админ-панель - Лаборатория робототехники{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Приветствие -->
+    <div class="welcome-section">
+        <h1>Админ-панель 👑</h1>
+        <p>Полное управление системой бронирования и оборудованием</p>
+    </div>
+
+    <!-- Быстрые действия для админа -->
+    <div class="quick-actions">
+        <a href="{{ url_for('admin_equipment') }}" class="action-card">
+            <div class="action-icon">🔧</div>
+            <h3>Управление оборудованием</h3>
+            <p>Добавление, удаление и редактирование оборудования</p>
+        </a>
+        
+        <a href="{{ url_for('admin_bookings') }}" class="action-card">
+            <div class="action-icon">📋</div>
+            <h3>Все бронирования</h3>
+            <p>Просмотр и управление всеми бронированиями системы</p>
+        </a>
+        
+        <a href="{{ url_for('admin_categories') }}" class="action-card">
+            <div class="action-icon">📁</div>
+            <h3>Категории</h3>
+            <p>Управление категориями оборудования</p>
+        </a>
+        
+        <a href="{{ url_for('reports') }}" class="action-card">
+            <div class="action-icon">📊</div>
+            <h3>Отчеты</h3>
+            <p>Аналитика и статистика системы</p>
+        </a>
+    </div>
+
+    <!-- Статистика системы -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Пользователей</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_equipment }}</div>
+            <div class="stat-label">Оборудования</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_bookings }}</div>
+            <div class="stat-label">Бронирований</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ available_equipment }}</div>
+            <div class="stat-label">Доступно сейчас</div>
+        </div>
+    </div>
+
+    <!-- Последние бронирования -->
+    <div class="card">
+        <h2>📋 Последние бронирования</h2>
+        <div class="bookings-list">
+            {% for booking in recent_bookings %}
+            <div class="booking-item">
+                <div class="booking-info">
+                    <strong>{{ booking.equipment.name }}</strong>
+                    <div class="booking-time">
+                        📅 {{ booking.start_date.strftime('%d.%m.%Y, %H:%M') }} - {{ booking.end_date.strftime('%H:%M') }}
+                    </div>
+                    <div class="booking-user">
+                        👤 {{ booking.user.username }} ({{ booking.user.email }})
+                    </div>
+                    <div class="booking-purpose">
+                        {{ booking.purpose }}
+                    </div>
+                </div>
+                <span class="booking-status {{ booking.status }}">
+                    {{ booking.status|title }}
+                </span>
+            </div>
+            {% else %}
+            <div class="no-bookings">
+                Нет активных бронирований
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+            <a href="{{ url_for('admin_bookings') }}" class="btn btn-outline-primary">Все бронирования</a>
+        </div>
+    </div>
+
+    <!-- Быстрый доступ -->
+    <div class="card">
+        <h2>⚡ Быстрые действия</h2>
+        <div class="quick-buttons">
+            <a href="{{ url_for('admin_equipment') }}" class="btn btn-primary">
+                ➕ Добавить оборудование
+            </a>
+            <a href="{{ url_for('admin_categories') }}" class="btn btn-secondary">
+                📁 Добавить категорию
+            </a>
+            <a href="{{ url_for('admin_bookings') }}" class="btn btn-info">
+                📋 Управление бронированиями
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.welcome-section {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.welcome-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.welcome-section p {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    opacity: 0.9;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.action-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-top: 2rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card h2 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+}
+
+.bookings-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.booking-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+}
+
+.booking-info {
+    flex: 1;
+}
+
+.booking-time {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+}
+
+.booking-user {
+    color: #555;
+    font-size: 0.85rem;
+    margin: 0.25rem 0;
+}
+
+.booking-purpose {
+    color: #888;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.booking-status {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.booking-status.pending {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.booking-status.confirmed {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.booking-status.rejected {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.booking-status.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.quick-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.quick-buttons .btn {
+    flex: 1;
+    min-width: 200px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.no-bookings {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-style: italic;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+    border: 1px solid #667eea;
+}
+
+.btn-primary:hover {
+    background: #5a6fd8;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: 1px solid #6c757d;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: white;
+}
+
+.btn-info {
+    background: #17a2b8;
+    color: white;
+    border: 1px solid #17a2b8;
+}
+
+.btn-info:hover {
+    background: #138496;
+    color: white;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: #667eea;
+    border: 1px solid #667eea;
+}
+
+.btn-outline-primary:hover {
+    background: #667eea;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+    
+    .welcome-section h1 {
+        font-size: 2rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .booking-item {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .quick-buttons {
+        flex-direction: column;
+    }
+    
+    .quick-buttons .btn {
+        min-width: auto;
+    }
+}
+</style>
+{% endblock %}

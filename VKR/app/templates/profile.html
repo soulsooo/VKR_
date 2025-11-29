@@ -1,0 +1,732 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль - Лаборатория робототехники{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Основная информация -->
+    <div class="card">
+        <div class="profile-header">
+            <h2><i class="fas fa-user-circle"></i> Профиль пользователя</h2>
+        </div>
+        <div class="profile-info">
+            <div class="profile-avatar">
+                <!-- Аватар с инициалами -->
+                <div class="avatar-initials-large">
+                    {{ user.username[0] | upper if user and user.username else "G" }}
+                </div>
+                <button class="btn btn-secondary btn-small">
+                    <i class="fas fa-camera"></i> Изменить фото
+                </button>
+            </div>
+            <div class="profile-details">
+                <div class="detail-row">
+                    <div class="detail-item">
+                        <label>Имя пользователя:</label>
+                        <span class="detail-value">{{ user.username if user else "Гость" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Роль:</label>
+                        <span class="detail-value">
+                            {% if user.role == 'admin' %}Администратор системы
+                            {% else %}Студент-исследователь{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-item">
+                        <label>Направление:</label>
+                        <span class="detail-value">Робототехника и искусственный интеллект</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Статус:</label>
+                        <span class="detail-value">
+                            {% if user.role == 'admin' %}Администратор
+                            {% else %}Активный студент{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-item">
+                        <label>Email:</label>
+                        <span class="detail-value">
+                            {% if user.email %}{{ user.email }}
+                            {% else %}Не указан{% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <label>ID пользователя:</label>
+                        <span class="detail-value">#{{ user.id if user else "000" }}</span>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-item full-width">
+                        <label>Область интересов:</label>
+                        <span class="detail-value">
+                            {% if user.role == 'admin' %}
+                            Управление лабораторией, администрирование системы, модерация
+                            {% else %}
+                            Разработка робототехнических систем, исследование ИИ, компьютерное зрение
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Статистика активности -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-calendar-check"></i>
+            <span class="stat-number">{{ user_bookings|length if user_bookings else '0' }}</span>
+            <span class="stat-label">Бронирований</span>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-robot"></i>
+            <span class="stat-number">{{ user_favorites|length if user_favorites else '0' }}</span>
+            <span class="stat-label">В избранном</span>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-tasks"></i>
+            <span class="stat-number">3</span>
+            <span class="stat-label">Выполненных квестов</span>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-clock"></i>
+            <span class="stat-number">156</span>
+            <span class="stat-label">Часов в лаборатории</span>
+        </div>
+    </div>
+
+    <!-- Блок избранного оборудования -->
+    <div class="card">
+        <h3><i class="fas fa-heart" style="color: #ff6b6b;"></i> Избранное оборудование</h3>
+        <div class="favorites-section">
+            <div class="favorites-stats">
+                <div class="favorite-stat">
+                    <i class="fas fa-star"></i>
+                    <span class="stat-number">{{ user_favorites|length if user_favorites else '0' }}</span>
+                    <span class="stat-label">в избранном</span>
+                </div>
+                <a href="/equipment" class="btn btn-primary">
+                    <i class="fas fa-arrow-right"></i>
+                    Перейти к оборудованию
+                </a>
+            </div>
+            
+            <div class="favorites-preview" id="favoritesPreview">
+                {% if user_favorites and user_favorites|length > 0 %}
+                    {% for favorite in user_favorites[:4] %}
+                    <div class="favorite-preview-item">
+                        <div class="favorite-item-image">
+                            <i class="fas fa-{{ 'robot' if favorite.equipment.category.name == 'Робоманипуляторы' else 'print' if favorite.equipment.category.name == '3D-печать' else 'desktop' if favorite.equipment.category.name == 'Рабочие места' else 'helicopter' if favorite.equipment.category.name == 'БПЛА' else 'cog' if favorite.equipment.category.name == 'ЧПУ станки' else 'tools' }}"></i>
+                        </div>
+                        <div class="favorite-item-info">
+                            <div class="favorite-item-name">{{ favorite.equipment.name }}</div>
+                            <span class="favorite-item-status status-{{ 'available' if favorite.equipment.is_available else 'busy' }}">
+                                {{ 'Доступно' if favorite.equipment.is_available else 'Занято' }}
+                            </span>
+                        </div>
+                        <a href="/equipment/{{ favorite.equipment.id }}" class="btn btn-outline btn-small">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-favorites">
+                        <div class="empty-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h4>В избранном пока пусто</h4>
+                        <p>Добавляйте оборудование в избранное, чтобы быстро находить его позже</p>
+                        <a href="/equipment" class="btn btn-outline">
+                            <i class="fas fa-search"></i>
+                            Найти оборудование
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Активность и достижения -->
+    <div class="activity-section">
+        <div class="card">
+            <h3><i class="fas fa-chart-line"></i> Активность в лаборатории</h3>
+            <div class="activity-stats">
+                <div class="activity-item">
+                    <span class="activity-label">Последнее посещение:</span>
+                    <span class="activity-value">Сегодня, 14:30</span>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-label">Статус в лаборатории:</span>
+                    <span class="activity-value status-active">Активный</span>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-label">Рейтинг активности:</span>
+                    <span class="activity-value">Высокий</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="fas fa-trophy"></i> Достижения</h3>
+            <div class="achievements-grid">
+                <div class="achievement-item">
+                    <i class="fas fa-medal" style="color: #FFD700;"></i>
+                    <span>Лучший проект месяца</span>
+                </div>
+                <div class="achievement-item">
+                    <i class="fas fa-star" style="color: #C0C0C0;"></i>
+                    <span>Активный исследователь</span>
+                </div>
+                <div class="achievement-item">
+                    <i class="fas fa-bolt" style="color: #CD7F32;"></i>
+                    <span>Быстрое обучение</span>
+                </div>
+                <div class="achievement-item">
+                    <i class="fas fa-users" style="color: #667eea;"></i>
+                    <span>Командный игрок</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- История бронирований -->
+    <div class="card">
+        <h3><i class="fas fa-history"></i> Последние бронирования</h3>
+        <div class="bookings-history">
+            {% if user_bookings and user_bookings|length > 0 %}
+                {% for booking in user_bookings[:5] %}
+                <div class="booking-history-item">
+                    <div class="booking-info">
+                        <h4>{{ booking.equipment.name if booking.equipment else 'Неизвестное оборудование' }}</h4>
+                        <p class="booking-time">
+                            📅 {{ booking.start_date.strftime('%d.%m.%Y') }} 
+                            ⏰ {{ booking.start_date.strftime('%H:%M') }} - {{ booking.end_date.strftime('%H:%M') }}
+                        </p>
+                        <p class="booking-purpose">{{ booking.purpose[:100] }}{% if booking.purpose|length > 100 %}...{% endif %}</p>
+                    </div>
+                    <div class="booking-status">
+                        <span class="status-badge {{ booking.status }}">
+                            {% if booking.status == 'confirmed' %}✅ Подтверждено
+                            {% elif booking.status == 'pending' %}⏳ Ожидание
+                            {% elif booking.status == 'rejected' %}❌ Отклонено
+                            {% elif booking.status == 'completed' %}📦 Завершено
+                            {% else %}{{ booking.status }}{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if user_bookings|length > 5 %}
+                <div class="view-all-container">
+                    <a href="/booking" class="btn btn-outline">Посмотреть все бронирования</a>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="no-bookings">
+                    <div class="no-bookings-icon">📅</div>
+                    <h4>У вас пока нет бронирований</h4>
+                    <p>Создайте первое бронирование, чтобы начать работу с оборудованием</p>
+                    <a href="/booking" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Создать бронирование
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+}
+
+.profile-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 1rem;
+}
+
+.profile-header h2 {
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profile-info {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.profile-avatar {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar-initials-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin: 0;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #667eea;
+    color: #667eea;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.detail-item label {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+.stat-card i {
+    font-size: 2rem;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.favorites-section {
+    padding: 1rem 0;
+}
+
+.favorites-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #fff5f5, #fff);
+    border-radius: 10px;
+    border-left: 4px solid #ff6b6b;
+}
+
+.favorite-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.favorite-stat i {
+    font-size: 1.5rem;
+    color: #ff6b6b;
+}
+
+.favorite-stat .stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.favorite-stat .stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.favorites-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.favorite-preview-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.favorite-preview-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.favorite-item-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.favorite-item-info {
+    flex: 1;
+}
+
+.favorite-item-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.favorite-item-status {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.status-available {
+    background: #e8f5e8;
+    color: #28a745;
+}
+
+.status-busy {
+    background: #ffe8e8;
+    color: #dc3545;
+}
+
+.empty-favorites {
+    text-align: center;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.empty-favorites .empty-icon {
+    font-size: 3rem;
+    color: #ff6b6b;
+    margin-bottom: 1rem;
+}
+
+.empty-favorites h4 {
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.empty-favorites p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.activity-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.activity-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.activity-value {
+    font-weight: 600;
+}
+
+.status-active {
+    color: #28a745;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.bookings-history {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.booking-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+}
+
+.booking-history-item:hover {
+    transform: translateX(5px);
+}
+
+.booking-info h4 {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.booking-time {
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.booking-purpose {
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-badge.confirmed {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.rejected {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-badge.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.view-all-container {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.no-bookings {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #666;
+}
+
+.no-bookings-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-bookings h4 {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+@media (max-width: 768px) {
+    .profile-info {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .detail-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .activity-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .favorites-stats {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .favorites-preview {
+        grid-template-columns: 1fr;
+    }
+    
+    .booking-history-item {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .profile-container {
+        padding: 0.5rem;
+    }
+    
+    .card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .avatar-initials-large {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}

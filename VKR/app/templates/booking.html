@@ -1,0 +1,639 @@
+{% extends "base.html" %}
+
+{% block title %}Бронирование - Лаборатория робототехники{% endblock %}
+
+{% block content %}
+<div class="booking-container">
+    <h1>📅 Бронирование оборудования</h1>
+
+    <!-- Flash сообщения -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="booking-grid">
+        <!-- Форма бронирования -->
+        <div class="card">
+            <h2>Новое бронирование</h2>
+            
+            <form method="POST" action="{{ url_for('booking') }}" class="booking-form">
+                <!-- Оборудование -->
+                <div class="form-group">
+                    <label>Оборудование</label>
+                    <select name="equipment_id" id="equipment_id" required>
+                        <option value="">Выберите оборудование</option>
+                        {% if items %}
+                            {% set categories = {} %}
+                            {% for item in items %}
+                                {% if item.category.name not in categories %}
+                                    {% set _ = categories.update({item.category.name: []}) %}
+                                {% endif %}
+                                {% set _ = categories[item.category.name].append(item) %}
+                            {% endfor %}
+                            
+                            {% for category_name, category_items in categories.items() %}
+                            <optgroup label="{{ category_name }}">
+                                {% for item in category_items %}
+                                <option value="{{ item.id }}" 
+                                        {% if not item.is_available %}disabled{% endif %}>
+                                    {{ item.name }}
+                                    {% if not item.is_available %}(Недоступно){% endif %}
+                                </option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled>Нет доступного оборудования</option>
+                        {% endif %}
+                    </select>
+                </div>
+                
+                <!-- Дата и время -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Дата и время начала</label>
+                        <input type="datetime-local" name="start_date" id="start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Дата и время окончания</label>
+                        <input type="datetime-local" name="end_date" id="end_date" required>
+                    </div>
+                </div>
+                
+                <!-- Цель использования -->
+                <div class="form-group">
+                    <label>Тип проекта</label>
+                    <select name="purpose_type" required>
+                        <option value="">Выберите тип проекта</option>
+                        <option value="study">Учебный проект</option>
+                        <option value="research">Научное исследование</option>
+                        <option value="coursework">Курсовая работа</option>
+                        <option value="diploma">Дипломная работа</option>
+                        <option value="competition">Соревнование/Конкурс</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                
+                <!-- Описание работ -->
+                <div class="form-group">
+                    <label>Подробное описание работ</label>
+                    <textarea 
+                        name="purpose" 
+                        placeholder="Опишите, что вы планируете делать, какие задачи решать, какие материалы использовать..."
+                        required
+                        rows="4"
+                    ></textarea>
+                    <small class="form-help">Опишите максимально подробно для быстрого рассмотрения заявки</small>
+                </div>
+                
+                <!-- Кнопка отправки -->
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                    Отправить запрос на бронирование
+                </button>
+            </form>
+        </div>
+
+        <!-- История бронирований -->
+        <div class="card">
+            <h2>📋 Мои бронирования</h2>
+            <div class="bookings-history">
+                {% if user_bookings and user_bookings|length > 0 %}
+                    {% for booking in user_bookings %}
+                    <div class="booking-item">
+                        <div class="booking-header">
+                            <div>
+                                <strong>{{ booking.equipment.name if booking.equipment else 'Неизвестно' }}</strong>
+                                <div class="booking-time">
+                                    📅 {{ booking.start_date.strftime('%d.%m.%Y, %H:%M') }} - {{ booking.end_date.strftime('%H:%M') }}
+                                </div>
+                            </div>
+                            <span class="status {{ booking.status }}">
+                                {% if booking.status == 'confirmed' %}✅ Подтверждено
+                                {% elif booking.status == 'pending' %}⏳ Ожидание
+                                {% elif booking.status == 'rejected' %}❌ Отклонено
+                                {% elif booking.status == 'completed' %}📦 Завершено
+                                {% else %}{{ booking.status }}{% endif %}
+                            </span>
+                        </div>
+                        <div class="booking-purpose">
+                            <strong>Цель:</strong> {{ booking.purpose }}
+                        </div>
+                        {% if booking.purpose_type %}
+                        <div class="booking-purpose-type">
+                            <strong>Тип проекта:</strong> 
+                            {% if booking.purpose_type == 'study' %}Учебный проект
+                            {% elif booking.purpose_type == 'research' %}Научное исследование
+                            {% elif booking.purpose_type == 'coursework' %}Курсовая работа
+                            {% elif booking.purpose_type == 'diploma' %}Дипломная работа
+                            {% elif booking.purpose_type == 'competition' %}Соревнование/Конкурс
+                            {% elif booking.purpose_type == 'other' %}Другое
+                            {% else %}{{ booking.purpose_type }}{% endif %}
+                        </div>
+                        {% endif %}
+                        <div class="booking-meta">
+                            <small>Создано: {{ booking.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-bookings">
+                        <div class="no-bookings-icon">📅</div>
+                        <h3>У вас пока нет бронирований</h3>
+                        <p>Создайте первое бронирование, чтобы начать работу с оборудованием</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.booking-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.booking-container h1 {
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.booking-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.card h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.booking-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    font-family: inherit;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-help {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Стили для группировки в выпадающем списке */
+optgroup {
+    font-weight: 600;
+    color: #2c3e50;
+    padding: 0.5rem 0;
+}
+
+optgroup option {
+    font-weight: normal;
+    color: #495057;
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+}
+
+optgroup option:disabled {
+    color: #999;
+    background: #f8f9fa;
+}
+
+/* История бронирований */
+.bookings-history {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.booking-item {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    transition: transform 0.2s ease;
+}
+
+.booking-item:hover {
+    transform: translateX(5px);
+}
+
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.booking-time {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.booking-purpose {
+    color: #555;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.booking-purpose-type {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    font-style: italic;
+}
+
+.booking-meta {
+    border-top: 1px solid #e9ecef;
+    padding-top: 0.75rem;
+}
+
+.booking-meta small {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+.status {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status.pending {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status.confirmed {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status.rejected {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.no-bookings {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #666;
+}
+
+.no-bookings-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-bookings h3 {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+/* Кнопка */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #667eea;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    justify-content: center;
+}
+
+.btn:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Flash сообщения */
+.flash-messages {
+    margin-bottom: 2rem;
+}
+
+.flash-success {
+    background: #d4edda;
+    color: #155724;
+    padding: 1rem 1.5rem;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.flash-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 1rem 1.5rem;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.flash-info {
+    background: #cce7ff;
+    color: #004085;
+    padding: 1rem 1.5rem;
+    border: 1px solid #b3d7ff;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .booking-container {
+        padding: 1rem;
+    }
+    
+    .booking-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .booking-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .card {
+        padding: 1.5rem;
+    }
+    
+    .no-bookings {
+        padding: 2rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-container h1 {
+        font-size: 1.8rem;
+    }
+    
+    .card h2 {
+        font-size: 1.3rem;
+    }
+}
+
+/* Индикатор загрузки */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.booking-form');
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    const equipmentSelect = document.getElementById('equipment_id');
+    
+    // Функция для форматирования даты в формат input[type="datetime-local"]
+    const formatDateForInput = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+    
+    // Устанавливаем минимальную дату как текущую
+    const now = new Date();
+    const currentDateTime = formatDateForInput(now);
+    
+    startDateInput.min = currentDateTime;
+    endDateInput.min = currentDateTime;
+    
+    // Устанавливаем разумные значения по умолчанию
+    const defaultStart = new Date(now.getTime() + 60 * 60 * 1000); // +1 час
+    const defaultEnd = new Date(defaultStart.getTime() + 2 * 60 * 60 * 1000); // +2 часа
+    
+    if (!startDateInput.value) {
+        startDateInput.value = formatDateForInput(defaultStart);
+    }
+    if (!endDateInput.value) {
+        endDateInput.value = formatDateForInput(defaultEnd);
+    }
+    
+    // Валидация дат на клиенте
+    form.addEventListener('submit', function(e) {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+        const now = new Date();
+        
+        // Проверка оборудования
+        if (!equipmentSelect.value) {
+            e.preventDefault();
+            showError('❌ Пожалуйста, выберите оборудование');
+            return false;
+        }
+        
+        // Проверка даты начала
+        if (startDate < now) {
+            e.preventDefault();
+            showError('❌ Нельзя выбирать прошедшую дату');
+            return false;
+        }
+        
+        // Проверка даты окончания
+        if (endDate <= startDate) {
+            e.preventDefault();
+            showError('❌ Дата окончания должна быть позже даты начала');
+            return false;
+        }
+        
+        // Проверяем, что разница не больше 7 дней
+        const diffTime = Math.abs(endDate - startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 7) {
+            e.preventDefault();
+            showError('❌ Бронирование не может превышать 7 дней');
+            return false;
+        }
+        
+        // Проверяем, что разница не меньше 30 минут
+        const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+        if (diffMinutes < 30) {
+            e.preventDefault();
+            showError('❌ Минимальное время бронирования - 30 минут');
+            return false;
+        }
+        
+        // Показываем индикатор загрузки
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.classList.add('loading');
+        submitBtn.innerHTML = '<i class="fas fa-spinner"></i> Отправка...';
+        
+        // Форма будет отправлена стандартным способом
+        return true;
+    });
+    
+    // Автоматическое обновление минимальной даты окончания
+    startDateInput.addEventListener('change', function() {
+        if (this.value) {
+            endDateInput.min = this.value;
+            
+            // Если дата окончания раньше новой даты начала, обновляем её
+            if (endDateInput.value && new Date(endDateInput.value) <= new Date(this.value)) {
+                const newEndDate = new Date(new Date(this.value).getTime() + 2 * 60 * 60 * 1000);
+                endDateInput.value = formatDateForInput(newEndDate);
+            }
+        }
+    });
+    
+    // Предупреждение о недоступном оборудовании
+    equipmentSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.disabled) {
+            showError('⚠️ Это оборудование временно недоступно для бронирования');
+            this.value = '';
+        }
+    });
+    
+    // Функция для показа ошибок
+    function showError(message) {
+        // Создаем временное flash сообщение
+        const flashDiv = document.createElement('div');
+        flashDiv.className = 'flash-error';
+        flashDiv.textContent = message;
+        flashDiv.style.animation = 'fadeIn 0.3s ease';
+        
+        const flashMessages = document.querySelector('.flash-messages');
+        if (flashMessages) {
+            flashMessages.appendChild(flashDiv);
+        } else {
+            // Создаем контейнер для flash сообщений если его нет
+            const container = document.createElement('div');
+            container.className = 'flash-messages';
+            container.appendChild(flashDiv);
+            document.querySelector('.booking-container h1').after(container);
+        }
+        
+        // Автоматически удаляем через 5 секунд
+        setTimeout(() => {
+            flashDiv.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => flashDiv.remove(), 300);
+        }, 5000);
+    }
+    
+    // Добавляем анимации для flash сообщений
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
+{% endblock %}

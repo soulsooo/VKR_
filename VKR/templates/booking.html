@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Бронирование - Лаборатория робототехники{% endblock %}
+
+{% block content %}
+<div class="booking-container">
+    <h1>📅 Бронирование оборудования</h1>
+
+    <div class="booking-grid">
+        <!-- Форма бронирования -->
+        <div class="card">
+            <h2>Новое бронирование</h2>
+            
+            <form method="POST" action="{{ url_for('create_booking') }}" class="booking-form">
+                <!-- Оборудование -->
+                <div class="form-group">
+                    <label>Оборудование</label>
+                    <select name="equipment_id" required>
+                        <option value="">Выберите оборудование</option>
+                        <!-- 3D-Печать -->
+                        <optgroup label="🖨️ 3D-Печать">
+                            <option value="designer_xl_pro">3D-принтер Designer XL Pro</option>
+                        </optgroup>
+                        
+                        <!-- Роботы-манипуляторы -->
+                        <optgroup label="🤖 Роботы-манипуляторы">
+                            <option value="kuka_kr4">KUKA KR 4 R600</option>
+                            <option value="lbr_iiwa">LBR iiwa 7 R800</option>
+                            <option value="hobots_pro">Hobots Pro</option>
+                        </optgroup>
+                        
+                        <!-- Компьютерная техника -->
+                        <optgroup label="💻 Компьютерная техника">
+                            <option value="hp_workstation">Рабочее место с компьютером HP</option>
+                        </optgroup>
+                        
+                        <!-- БПЛА (Дроны) -->
+                        <optgroup label="🚁 БПЛА (Дроны)">
+                            <option value="iflight_quadcopter">Квадрокоптер Ifight 4 оси</option>
+                            <option value="zohd_dart">Самолет ZOHD Dart250G</option>
+                        </optgroup>
+                        
+                        <!-- Обрабатывающие станки -->
+                        <optgroup label="⚙️ Обрабатывающие станки">
+                            <option value="cnc_vm18l">ЧПУ станок VM18L</option>
+                            <option value="zubr_saw">Торцовочная пила ЗУБР ЗПТК-210-1500</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <!-- Дата и время -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Дата начала</label>
+                        <input type="date" name="start_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Время начала</label>
+                        <input type="time" name="start_time" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Дата окончания</label>
+                        <input type="date" name="end_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Время окончания</label>
+                        <input type="time" name="end_time" required>
+                    </div>
+                </div>
+                
+                <!-- Цель использования -->
+                <div class="form-group">
+                    <label>Цель использования</label>
+                    <select name="purpose_type" required>
+                        <option value="">Выберите цель</option>
+                        <option value="study">Учебный проект</option>
+                        <option value="research">Научное исследование</option>
+                        <option value="coursework">Курсовая работа</option>
+                        <option value="diploma">Дипломная работа</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                
+                <!-- Описание работ -->
+                <div class="form-group">
+                    <label>Описание работ</label>
+                    <textarea 
+                        name="purpose" 
+                        placeholder="Опишите, что вы планируете делать..."
+                        required
+                    ></textarea>
+                </div>
+                
+                <!-- Кнопка отправки -->
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                    Отправить запрос на бронирование
+                </button>
+            </form>
+        </div>
+        <!-- История бронирований -->
+        <div class="card">
+            <h2>📋 История бронирований</h2>
+            <div class="bookings-history">
+                
+                <!-- Пример брони 1 -->
+                <div class="booking-item">
+                    <div class="booking-header">
+                        <div>
+                            <strong>3D-принтер Designer XL Pro</strong>
+                            <div class="booking-time">15 января 2026, 14:00-16:00</div>
+                        </div>
+                        <span class="status confirmed">Подтверждено</span>
+                    </div>
+                    <div class="booking-purpose">Печать корпуса для робота-манипулятора</div>
+                </div>
+                
+                <!-- Пример брони 2 -->
+                <div class="booking-item">
+                    <div class="booking-header">
+                        <div>
+                            <strong>Рабочее место с компьютером HP</strong>
+                            <div class="booking-time">12 января 2026, 10:00-12:00</div>
+                        </div>
+                        <span class="status completed">Завершено</span>
+                    </div>
+                    <div class="booking-purpose">Программирование системы управления для KUKA KR 4</div>
+                </div>
+                
+                <!-- Пример брони 3 -->
+                <div class="booking-item">
+                    <div class="booking-header">
+                        <div>
+                            <strong>Коллаборативный робот LBR iiwa 7 R800</strong>
+                            <div class="booking-time">18 января 2026, 15:00-17:00</div>
+                        </div>
+                        <span class="status pending">Ожидает подтверждения</span>
+                    </div>
+                    <div class="booking-purpose">Тестирование алгоритмов компьютерного зрения</div>
+                </div>
+
+                <!-- Пример брони 4 -->
+                <div class="booking-item">
+                    <div class="booking-header">
+                        <div>
+                            <strong>ЧПУ станок VM18L</strong>
+                            <div class="booking-time">20 января 2026, 09:00-11:00</div>
+                        </div>
+                        <span class="status confirmed">Подтверждено</span>
+                    </div>
+                    <div class="booking-purpose">Фрезеровка деталей для квадрокоптера</div>
+                </div>
+
+                <!-- Пример брони 5 -->
+                <div class="booking-item">
+                    <div class="booking-header">
+                        <div>
+                            <strong>Квадрокоптер Ifight 4 оси</strong>
+                            <div class="booking-time">22 января 2026, 13:00-15:00</div>
+                        </div>
+                        <span class="status completed">Завершено</span>
+                    </div>
+                    <div class="booking-purpose">Тестовые полеты и настройка FPV системы</div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.booking-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.booking-container h1 {
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.booking-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.card h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.booking-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-group textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+/* Стили для группировки в выпадающем списке */
+optgroup {
+    font-weight: 600;
+    color: #2c3e50;
+    padding: 0.5rem 0;
+}
+
+optgroup option {
+    font-weight: normal;
+    color: #495057;
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+}
+
+.bookings-history {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.booking-item {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+}
+
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.75rem;
+}
+
+.booking-time {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.booking-purpose {
+    color: #666;
+    font-size: 1rem;
+}
+
+.status {
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status.confirmed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+@media (max-width: 768px) {
+    .booking-container {
+        padding: 1rem;
+    }
+    
+    .booking-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .booking-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}

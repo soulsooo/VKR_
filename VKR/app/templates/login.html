@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card tech-card">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Вход в систему</h2>
+                    
+                    <form method="POST" action="/login">
+                        <div class="mb-3">
+                            <label class="form-label">Логин</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Пароль</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-sign-in-alt me-2"></i>Войти
+                        </button>
+                    </form>
+
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <small class="text-dark">
+                            <strong>Тестовый аккаунт:</strong><br>
+                            Логин: student<br>
+                            Пароль: password
+                        </small>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="/">← На главную</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

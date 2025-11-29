@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчеты - Лаборатория робототехники</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v={{ version }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .avatar-image-header {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: #555;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Стили для отчетов */
+        .reports-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .reports-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .reports-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Метрики */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Основной контент */
+        .reports-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .report-header h2 {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .report-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Рейтинг пользователей */
+        .users-ranking {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .user-rank-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .rank-number {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .avatar-image-small {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .stat-badge {
+            background: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: #667eea;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Динамика посещений */
+        .visits-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .visit-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .month-name {
+            min-width: 80px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .visit-bar {
+            flex: 1;
+            height: 25px;
+            background: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 1rem;
+            min-width: 40px;
+        }
+
+        .bar-value {
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .chart-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .growth-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #28a745;
+        }
+
+        /* Состояние оборудования */
+        .status-overview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .status-count {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .equipment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .equipment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .equipment-item.unavailable {
+            border-left-color: #dc3545;
+        }
+
+        .equipment-info h4 {
+            margin: 0 0 0.25rem 0;
+            color: #2c3e50;
+        }
+
+        .equipment-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .state-badge {
+            padding: 0.5rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Развитие лаборатории */
+        .progress-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .progress-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .progress-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .progress-count {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* Новые классы для прогресс-баров */
+        .completed-fill {
+            width: 40%;
+            background: #28a745;
+        }
+
+        .in-progress-fill {
+            width: 27%;
+            background: #ffc107;
+        }
+
+        .planned-fill {
+            width: 33%;
+            background: #6c757d;
+        }
+
+        /* Новые классы для баров посещений */
+        .visit-september .bar-fill {
+            width: 65%;
+        }
+
+        .visit-october .bar-fill {
+            width: 75%;
+        }
+
+        .visit-november .bar-fill {
+            width: 85%;
+        }
+
+        .growth-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .growth-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .growth-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            background: #28a745;
+        }
+
+        .growth-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .growth-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .reports-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .status-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .growth-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-rank-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .user-stats {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding: 0 1rem;
+            }
+            
+            .nav-content {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🤖 Лаборатория робототехники</h1>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <div class="avatar-placeholder">🤖</div>
+                </div>
+                <span class="user-name">Лаборатория</span>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="/dashboard">Главная</a>
+            <a href="/booking">Бронирование</a>
+            <a href="/equipment">Оборудование</a>
+            <a href="/quests">Квесты</a>
+            <a href="/profile">Профиль</a>
+            <a href="/reports" class="active">Отчеты</a>
+            <a href="/logout" style="margin-left: auto;">Выйти</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="reports-header">
+            <h1>📊 Отчетность лаборатории</h1>
+            <p class="reports-subtitle">Статистика по пользователям, оборудованию и развитию лаборатории</p>
+        </div>
+
+        <!-- Основные метрики -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="metric-number">97</div>
+                <div class="metric-label">Всего пользователей</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="metric-number">10</div>
+                <div class="metric-label">Единиц оборудования</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="metric-number">17</div>
+                <div class="metric-label">Всего бронирований</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="metric-number">8</div>
+                <div class="metric-label">Активных проектов</div>
+            </div>
+        </div>
+
+        <div class="reports-content">
+            <!-- Левая колонка -->
+            <div class="reports-column">
+                <!-- Активность пользователей -->
+                <div class="report-card">
+                    <div class="report-header">
+                        <h2><i class="fas fa-user-chart"></i> Активность пользователей</h2>
+                        <span class="report-badge">Топ-3</span>
+                    </div>
+                    <div class="users-ranking">
+                        <div class="user-rank-item">
+                            <div class="rank-number">1</div>
+                            <div class="user-avatar-small">
+                                <img src="https://avatars.dzeninfra.ru/get-zen_doc/1577695/pub_5e6369fa699c9613543b08c7_5e636a29699c9613543b08cc/scale_1200" 
+                                     alt="Иванов Иван" 
+                                     class="avatar-image-small">
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">Иванов Иван</div>
+                                <div class="user-role">Студент</div>
+                            </div>
+                            <div class="user-stats">
+                                <div class="stat-badge">
+                                    <i class="fas fa-calendar"></i>
+                                    24
+                                </div>
+                                <div class="stat-badge">
+                                    <i class="fas fa-clock"></i>
+                                    156ч
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-rank-item">
+                            <div class="rank-number">2</div>
+                            <div class="user-avatar-small">
+                                <div class="avatar-placeholder">П</div>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">Петров Петр</div>
+                                <div class="user-role">Преподаватель</div>
+                            </div>
+                            <div class="user-stats">
+                                <div class="stat-badge">
+                                    <i class="fas fa-calendar"></i>
+                                    18
+                                </div>
+                                <div class="stat-badge">
+                                    <i class="fas fa-clock"></i>
+                                    132ч
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-rank-item">
+                            <div class="rank-number">3</div>
+                            <div class="user-avatar-small">
+                                <div class="avatar-placeholder">С</div>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">Сидорова Светлана</div>
+                                <div class="user-role">Студент</div>
+                            </div>
+                            <div class="user-stats">
+                                <div class="stat-badge">
+                                    <i class="fas fa-calendar"></i>
+                                    15
+                                </div>
+                                <div class="stat-badge">
+                                    <i class="fas fa-clock"></i>
+                                    98ч
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Динамика посещений -->
+                <div class="report-card">
+                    <div class="report-header">
+                        <h2><i class="fas fa-chart-bar"></i> Динамика посещений</h2>
+                    </div>
+                    <div class="visits-chart">
+                        <div class="visit-item visit-september">
+                            <div class="month-name">сентябрь</div>
+                            <div class="visit-bar">
+                                <div class="bar-fill">
+                                    <span class="bar-value">156</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="visit-item visit-october">
+                            <div class="month-name">октябрь</div>
+                            <div class="visit-bar">
+                                <div class="bar-fill">
+                                    <span class="bar-value">182</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="visit-item visit-november">
+                            <div class="month-name">ноябрь</div>
+                            <div class="visit-bar">
+                                <div class="bar-fill">
+                                    <span class="bar-value">208</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-footer">
+                        <div class="growth-indicator">
+                            <i class="fas fa-arrow-up"></i>
+                            Рост посещений на 25% за квартал
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка -->
+            <div class="reports-column">
+                <!-- Состояние оборудования -->
+                <div class="report-card">
+                    <div class="report-header">
+                        <h2><i class="fas fa-microchip"></i> Состояние оборудования</h2>
+                    </div>
+                    <div class="equipment-status">
+                        <div class="status-overview">
+                            <div class="status-item" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                                <span class="status-count">7</span>
+                                <span class="status-label">Доступно</span>
+                            </div>
+                            <div class="status-item" style="background: linear-gradient(135deg, #dc3545, #e83e8c);">
+                                <span class="status-count">3</span>
+                                <span class="status-label">Недоступно</span>
+                            </div>
+                        </div>
+                        
+                        <div class="equipment-list">
+                            <div class="equipment-item">
+                                <div class="equipment-info">
+                                    <h4>3-D принтер Designer XL Pro</h4>
+                                    <div class="equipment-meta">
+                                        <span class="usage">Использований: 45</span>
+                                    </div>
+                                </div>
+                                <div class="equipment-state">
+                                    <span class="state-badge" style="background: #d4edda; color: #155724;">✅ Доступно</span>
+                                </div>
+                            </div>
+                            
+                            <div class="equipment-item unavailable">
+                                <div class="equipment-info">
+                                    <h4>ЗУБР ЗПТК-210-1500</h4>
+                                    <div class="equipment-meta">
+                                        <span class="usage">Использований: 28</span>
+                                    </div>
+                                </div>
+                                <div class="equipment-state">
+                                    <span class="state-badge" style="background: #f8d7da; color: #721c24;">🔧 На обслуживании</span>
+                                </div>
+                            </div>
+                            
+                            <div class="equipment-item">
+                                <div class="equipment-info">
+                                    <h4>Робот-манипулятор KUKA KR 4 R600</h4>
+                                    <div class="equipment-meta">
+                                        <span class="usage">Использований: 67</span>
+                                    </div>
+                                </div>
+                                <div class="equipment-state">
+                                    <span class="state-badge" style="background: #d4edda; color: #155724;">✅ Доступно</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Развитие лаборатории -->
+                <div class="report-card">
+                    <div class="report-header">
+                        <h2><i class="fas fa-rocket"></i> Развитие лаборатории</h2>
+                    </div>
+                    <div class="development-stats">
+                        <div class="progress-section">
+                            <h3>Статус проектов</h3>
+                            <div class="progress-bars">
+                                <div class="progress-item">
+                                    <div class="progress-label">
+                                        <span>Завершенные</span>
+                                        <span class="progress-count">12</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill completed-fill"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-label">
+                                        <span>В работе</span>
+                                        <span class="progress-count">8</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill in-progress-fill"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-label">
+                                        <span>В планах</span>
+                                        <span class="progress-count">10</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill planned-fill"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="growth-metrics">
+                            <div class="growth-item">
+                                <div class="growth-icon">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <div class="growth-info">
+                                    <div class="growth-value">+15%</div>
+                                    <div class="growth-label">Рост посещений</div>
+                                </div>
+                            </div>
+                            <div class="growth-item">
+                                <div class="growth-icon">
+                                    <i class="fas fa-arrow-up"></i>
+                                </div>
+                                <div class="growth-info">
+                                    <div class="growth-value">+8</div>
+                                    <div class="growth-label">Новых проектов</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

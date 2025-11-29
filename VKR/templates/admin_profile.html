@@ -1,0 +1,63 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Профиль администратора{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Профиль администратора</h1>
+    <div class="card">
+        <div class="card-body">
+            <h3>{{ user.username }}</h3>
+            <p><strong>Роль:</strong> Администратор системы</p>
+            <p><strong>Email:</strong> {{ user.email or 'Не указан' }}</p>
+            <p><strong>ID:</strong> #{{ user.id }}</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h4>{{ users_count }}</h4>
+                        <p>Пользователей</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h4>{{ equipment_count }}</h4>
+                        <p>Оборудования</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h4>{{ total_bookings }}</h4>
+                        <p>Бронирований</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h4>{{ active_bookings }}</h4>
+                        <p>Активных броней</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.stat-card {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+.stat-card h4 {
+    font-size: 2rem;
+    margin: 0;
+    color: #dc3545;
+    font-weight: bold;
+}
+.stat-card p {
+    margin: 0.5rem 0 0 0;
+    color: #666;
+}
+</style>
+{% endblock %}

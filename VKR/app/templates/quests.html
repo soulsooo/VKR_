@@ -1,0 +1,1376 @@
+{% extends "base.html" %}
+
+{% block title %}Квесты - Лаборатория робототехники{% endblock %}
+
+{% block content %}
+<div class="quests-page">
+    <div class="page-header">
+        <h1>🎯 Квесты и обучение</h1>
+        
+        {% if user and user.role == 'admin' %}
+        <p class="page-subtitle">Управление обучающими квестами и отслеживание прогресса пользователей</p>
+        {% else %}
+        <p class="page-subtitle">Освойте оборудование лаборатории через практические задания</p>
+        {% endif %}
+    </div>
+
+    <!-- Админ-панель управления квестами -->
+    {% if user and user.role == 'admin' %}
+    <div class="admin-panel">
+        <div class="admin-header">
+            <h2><i class="fas fa-user-shield"></i> Панель управления квестами</h2>
+            <div class="admin-stats">
+                <span class="admin-badge">Всего квестов: 4</span>
+                <span class="admin-badge">Активных: 3</span>
+                <span class="admin-badge">В разработке: 1</span>
+            </div>
+        </div>
+        
+        <div class="admin-controls">
+            <button class="btn btn-admin" onclick="showAddQuestModal()">
+                <i class="fas fa-plus"></i> Создать квест
+            </button>
+            <button class="btn btn-admin" onclick="showUserProgressModal()">
+                <i class="fas fa-chart-line"></i> Статистика прогресса
+            </button>
+            <button class="btn btn-admin" onclick="exportQuestData()">
+                <i class="fas fa-file-export"></i> Экспорт данных
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="quests-container">
+        <!-- Квест 1 -->
+        <div class="quest-card completed">
+            {% if user.role == 'admin' %}
+            <div class="admin-quest-overlay">
+                <div class="admin-quest-controls">
+                    <button class="btn btn-sm btn-edit" onclick="editQuest(1)" title="Редактировать квест">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-stats" onclick="showQuestStats(1)" title="Статистика квеста">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                    <button class="btn btn-sm btn-users" onclick="showQuestUsers(1)" title="Участники квеста">
+                        <i class="fas fa-users"></i>
+                    </button>
+                </div>
+                <div class="quest-admin-badge active">
+                    Активен • 45 студентов
+                </div>
+            </div>
+            {% else %}
+            <div class="quest-user-badge completed">
+                ✅ Завершено
+            </div>
+            {% endif %}
+            
+            <!-- Заголовок квеста -->
+            <div class="quest-header">
+                <div class="quest-icon" style="background: #4CAF50;">
+                    🖨️
+                </div>
+                <div class="quest-main">
+                    <h3>Основы 3D-печати</h3>
+                    <p class="quest-description">Изучите принципы работы 3D-принтера и создайте свою первую модель</p>
+                    <div class="quest-meta">
+                        <span class="meta-item"><i class="fas fa-clock"></i> 2-3 часа</span>
+                        <span class="meta-item"><i class="fas fa-tasks"></i> 4 задания</span>
+                        {% if user.role == 'admin' %}
+                        <span class="meta-item"><i class="fas fa-users"></i> 45 студентов</span>
+                        <span class="meta-item"><i class="fas fa-chart-line"></i> 92% успеха</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Прогресс квеста -->
+            <div class="quest-progress">
+                <div class="progress-info">
+                    <span>Прогресс:</span>
+                    <strong>
+                        {% if user.role == 'admin' %}
+                            92% успеха
+                        {% else %}
+                            100%
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {% if user.role == 'admin' %}92{% else %}100{% endif %}%; background: #4CAF50;"></div>
+                </div>
+            </div>
+
+            <!-- Задания квеста -->
+            <div class="quest-tasks">
+                <h4>Задания квеста:</h4>
+                <div class="tasks-grid">
+                    <!-- Задание 1 -->
+                    <div class="task-item reading completed" {% if user.role != 'admin' %}onclick="openTask('/quest/1/task/1')"{% endif %}>
+                        <div class="task-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Основы 3D-печати</div>
+                            <div class="task-status">
+                                {% if user.role == 'admin' %}
+                                <span class="task-stats">95% завершено</span>
+                                {% else %}
+                                <i class="fas fa-check"></i> Завершено
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if user.role == 'admin' %}
+                        <div class="task-admin-actions">
+                            <button class="btn btn-xs btn-edit" onclick="editTask(1)" title="Редактировать задание">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Задание 2 -->
+                    <div class="task-item quiz completed" {% if user.role != 'admin' %}onclick="openTask('/quest/1/task/2')"{% endif %}>
+                        <div class="task-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Тест по безопасности</div>
+                            <div class="task-status">
+                                {% if user.role == 'admin' %}
+                                <span class="task-stats">88% завершено</span>
+                                {% else %}
+                                <i class="fas fa-check"></i> Завершено
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if user.role == 'admin' %}
+                        <div class="task-admin-actions">
+                            <button class="btn btn-xs btn-edit" onclick="editTask(2)" title="Редактировать задание">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Футер квеста -->
+            <div class="quest-footer">
+                <div class="quest-rewards">
+                    <strong><i class="fas fa-trophy"></i> Награды:</strong>
+                    <span>Допуск к 3D-принтерам, +100 опыта</span>
+                </div>
+                {% if user.role != 'admin' %}
+                <button class="btn btn-primary" onclick="continueQuest(1)">
+                    <i class="fas fa-redo"></i> Повторить
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Квест 2 -->
+        <div class="quest-card">
+            {% if user.role == 'admin' %}
+            <div class="admin-quest-overlay">
+                <div class="admin-quest-controls">
+                    <button class="btn btn-sm btn-edit" onclick="editQuest(2)" title="Редактировать квест">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-stats" onclick="showQuestStats(2)" title="Статистика квеста">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                    <button class="btn btn-sm btn-users" onclick="showQuestUsers(2)" title="Участники квеста">
+                        <i class="fas fa-users"></i>
+                    </button>
+                </div>
+                <div class="quest-admin-badge active">
+                    Активен • 32 студентов
+                </div>
+            </div>
+            {% else %}
+            <div class="quest-user-badge active">
+                🔥 Активно
+            </div>
+            {% endif %}
+            
+            <div class="quest-header">
+                <div class="quest-icon" style="background: #2196F3;">
+                    🤖
+                </div>
+                <div class="quest-main">
+                    <h3>Программирование роботов</h3>
+                    <p class="quest-description">Освойте базовые команды для роботов-манипуляторов</p>
+                    <div class="quest-meta">
+                        <span class="meta-item"><i class="fas fa-clock"></i> 3-4 часа</span>
+                        <span class="meta-item"><i class="fas fa-tasks"></i> 5 заданий</span>
+                        {% if user.role == 'admin' %}
+                        <span class="meta-item"><i class="fas fa-users"></i> 32 студентов</span>
+                        <span class="meta-item"><i class="fas fa-chart-line"></i> 78% успеха</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quest-progress">
+                <div class="progress-info">
+                    <span>Прогресс:</span>
+                    <strong>
+                        {% if user.role == 'admin' %}
+                            78% успеха
+                        {% else %}
+                            75%
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {% if user.role == 'admin' %}78{% else %}75{% endif %}%; background: #2196F3;"></div>
+                </div>
+            </div>
+
+            <div class="quest-tasks">
+                <h4>Задания квеста:</h4>
+                <div class="tasks-grid">
+                    <!-- Задание 1 -->
+                    <div class="task-item reading completed" {% if user.role != 'admin' %}onclick="openTask('/quest/2/task/1')"{% endif %}>
+                        <div class="task-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Основы робототехники</div>
+                            <div class="task-status">
+                                {% if user.role == 'admin' %}
+                                <span class="task-stats">85% завершено</span>
+                                {% else %}
+                                <i class="fas fa-check"></i> Завершено
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Задание 2 -->
+                    <div class="task-item practical active" {% if user.role != 'admin' %}onclick="openTask('/quest/2/task/2')"{% endif %}>
+                        <div class="task-icon">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">Практика с манипулятором</div>
+                            <div class="task-status">
+                                {% if user.role == 'admin' %}
+                                <span class="task-stats">65% завершено</span>
+                                {% else %}
+                                <i class="fas fa-play"></i> Активно
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-footer">
+                <div class="quest-rewards">
+                    <strong><i class="fas fa-trophy"></i> Награды:</strong>
+                    <span>Допуск к роботам-манипуляторам, +150 опыта</span>
+                </div>
+                {% if user.role != 'admin' %}
+                <button class="btn btn-primary" onclick="continueQuest(2)">
+                    <i class="fas fa-play"></i> Продолжить
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Квест 3 -->
+        <div class="quest-card">
+            {% if user.role == 'admin' %}
+            <div class="admin-quest-overlay">
+                <div class="admin-quest-controls">
+                    <button class="btn btn-sm btn-edit" onclick="editQuest(3)" title="Редактировать квест">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-stats" onclick="showQuestStats(3)" title="Статистика квеста">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                    <button class="btn btn-sm btn-users" onclick="showQuestUsers(3)" title="Участники квеста">
+                        <i class="fas fa-users"></i>
+                    </button>
+                </div>
+                <div class="quest-admin-badge active">
+                    Активен • 28 студентов
+                </div>
+            </div>
+            {% else %}
+            <div class="quest-user-badge active">
+                🔥 Активно
+            </div>
+            {% endif %}
+            
+            <div class="quest-header">
+                <div class="quest-icon" style="background: #FF9800;">
+                    ⚙️
+                </div>
+                <div class="quest-main">
+                    <h3>Работа с ЧПУ станками</h3>
+                    <p class="quest-description">Научитесь создавать программы для ЧПУ обработки</p>
+                    <div class="quest-meta">
+                        <span class="meta-item"><i class="fas fa-clock"></i> 4-5 часов</span>
+                        <span class="meta-item"><i class="fas fa-tasks"></i> 6 заданий</span>
+                        {% if user.role == 'admin' %}
+                        <span class="meta-item"><i class="fas fa-users"></i> 28 студентов</span>
+                        <span class="meta-item"><i class="fas fa-chart-line"></i> 45% успеха</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quest-progress">
+                <div class="progress-info">
+                    <span>Прогресс:</span>
+                    <strong>
+                        {% if user.role == 'admin' %}
+                            45% успеха
+                        {% else %}
+                            30%
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {% if user.role == 'admin' %}45{% else %}30{% endif %}%; background: #FF9800;"></div>
+                </div>
+            </div>
+
+            <div class="quest-footer">
+                <div class="quest-rewards">
+                    <strong><i class="fas fa-trophy"></i> Награды:</strong>
+                    <span>Допуск к ЧПУ станкам, +200 опыта</span>
+                </div>
+                {% if user.role != 'admin' %}
+                <button class="btn btn-primary" onclick="continueQuest(3)">
+                    <i class="fas fa-play"></i> Продолжить
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Квест 4 -->
+        <div class="quest-card">
+            {% if user.role == 'admin' %}
+            <div class="admin-quest-overlay">
+                <div class="admin-quest-controls">
+                    <button class="btn btn-sm btn-edit" onclick="editQuest(4)" title="Редактировать квест">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-stats" onclick="showQuestStats(4)" title="Статистика квеста">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                    <button class="btn btn-sm btn-users" onclick="showQuestUsers(4)" title="Участники квеста">
+                        <i class="fas fa-users"></i>
+                    </button>
+                </div>
+                <div class="quest-admin-badge draft">
+                    Черновик • 0 студентов
+                </div>
+            </div>
+            {% else %}
+            <div class="quest-user-badge available">
+                🔒 Доступно
+            </div>
+            {% endif %}
+            
+            <div class="quest-header">
+                <div class="quest-icon" style="background: #9C27B0;">
+                    🚁
+                </div>
+                <div class="quest-main">
+                    <h3>Управление БПЛА</h3>
+                    <p class="quest-description">Освойте пилотирование беспилотных летательных аппаратов</p>
+                    <div class="quest-meta">
+                        <span class="meta-item"><i class="fas fa-clock"></i> 5-6 часов</span>
+                        <span class="meta-item"><i class="fas fa-tasks"></i> 7 заданий</span>
+                        {% if user.role == 'admin' %}
+                        <span class="meta-item"><i class="fas fa-users"></i> 0 студентов</span>
+                        <span class="meta-item"><i class="fas fa-chart-line"></i> 0% успеха</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quest-progress">
+                <div class="progress-info">
+                    <span>Прогресс:</span>
+                    <strong>
+                        {% if user.role == 'admin' %}
+                            0% успеха
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%; background: #9C27B0;"></div>
+                </div>
+            </div>
+
+            <div class="quest-footer">
+                <div class="quest-rewards">
+                    <strong><i class="fas fa-trophy"></i> Награды:</strong>
+                    <span>Допуск к БПЛА, +180 опыта</span>
+                </div>
+                {% if user.role != 'admin' %}
+                <button class="btn btn-primary" onclick="continueQuest(4)">
+                    <i class="fas fa-play"></i> Начать
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальные окна для администраторов -->
+{% if user and user.role == 'admin' %}
+<!-- Модальное окно создания квеста -->
+<div id="addQuestModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-plus"></i> Создать новый квест</h3>
+            <span class="close" onclick="closeAddQuestModal()">&times;</span>
+        </div>
+        <form id="addQuestForm" class="modal-form">
+            <div class="form-group">
+                <label>Название квеста:</label>
+                <input type="text" name="title" required placeholder="Основы 3D-печати">
+            </div>
+            <div class="form-group">
+                <label>Описание:</label>
+                <textarea name="description" rows="3" required placeholder="Краткое описание квеста..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Иконка:</label>
+                <select name="icon" required>
+                    <option value="🖨">🖨 3D-печать</option>
+                    <option value="🤖">🤖 Роботы</option>
+                    <option value="⚙️">⚙️ ЧПУ</option>
+                    <option value="🚁">🚁 БПЛА</option>
+                    <option value="🔌">🔌 Электроника</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Цвет:</label>
+                <input type="color" name="color" value="#4CAF50" required>
+                <small style="color: #666; font-size: 0.8rem; margin-top: 0.5rem; display: block;">Выберите цвет для квеста</small>
+            </div>
+            <div class="form-group">
+                <label>Ожидаемое время прохождения:</label>
+                <input type="text" name="duration" placeholder="2-3 часа" required>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeAddQuestModal()">Отмена</button>
+                <button type="submit" class="btn btn-primary">Создать квест</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно статистики квеста -->
+<div id="questStatsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-chart-bar"></i> Статистика квеста</h3>
+            <span class="close" onclick="closeQuestStatsModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="questStatsContent">
+                <!-- Статистика будет загружена динамически -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+/* Основные стили страницы */
+.quests-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Админ-панель */
+.admin-panel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.admin-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.admin-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.admin-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.admin-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-admin {
+    background: rgba(255,255,255,0.9);
+    color: #667eea;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-admin:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Контейнер квестов */
+.quests-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+/* Карточка квеста */
+.quest-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.quest-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.quest-card.completed {
+    border-left: 4px solid #4CAF50;
+}
+
+/* Админ-оверлей */
+.admin-quest-overlay {
+    position: relative;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.admin-quest-controls {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.quest-admin-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+}
+
+.quest-admin-badge.active {
+    background: rgba(40, 167, 69, 0.9);
+}
+
+.quest-admin-badge.draft {
+    background: rgba(108, 117, 125, 0.9);
+}
+
+/* Бейдж для пользователей */
+.quest-user-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    z-index: 2;
+}
+
+.quest-user-badge.completed {
+    background: #E8F5E9;
+    color: #2E7D32;
+    border: 1px solid #C8E6C9;
+}
+
+.quest-user-badge.active {
+    background: #E3F2FD;
+    color: #1565C0;
+    border: 1px solid #BBDEFB;
+}
+
+.quest-user-badge.available {
+    background: #F3E5F5;
+    color: #7B1FA2;
+    border: 1px solid #E1BEE7;
+}
+
+/* Заголовок квеста */
+.quest-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-right: 120px;
+    position: relative;
+}
+
+.quest-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.quest-main {
+    flex: 1;
+    min-width: 0;
+    padding-right: 0;
+}
+
+.quest-main h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.3;
+    word-wrap: break-word;
+}
+
+.quest-description {
+    margin: 0 0 1rem 0;
+    color: #666;
+    line-height: 1.5;
+    font-size: 0.95rem;
+    word-wrap: break-word;
+}
+
+.quest-meta {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.meta-item i {
+    color: #667eea;
+    width: 16px;
+}
+
+/* Прогресс квеста */
+.quest-progress {
+    margin-bottom: 1.5rem;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.progress-info strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.progress-bar {
+    background: #e9ecef;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.8s ease;
+}
+
+/* Задания квеста */
+.quest-tasks {
+    margin-bottom: 1.5rem;
+}
+
+.quest-tasks h4 {
+    margin: 0 0 1rem 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.tasks-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    background: #f8f9fa;
+    cursor: pointer;
+}
+
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #667eea;
+}
+
+.task-item.reading {
+    border-left: 4px solid #4CAF50;
+}
+
+.task-item.quiz {
+    border-left: 4px solid #2196F3;
+}
+
+.task-item.practical {
+    border-left: 4px solid #FF9800;
+}
+
+.task-item.completed {
+    opacity: 0.7;
+    background: #f8fff8;
+}
+
+.task-item.active {
+    background: #f0f8ff;
+    border-color: #2196F3;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4); }
+    70% { box-shadow: 0 0 0 5px rgba(33, 150, 243, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0); }
+}
+
+.task-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    color: #667eea;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.task-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+    color: #2c3e50;
+    word-wrap: break-word;
+}
+
+.task-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.task-status.completed { color: #27AE60; }
+.task-status.active { color: #2980B9; }
+.task-status:not(.completed):not(.active) { color: #7F8C8D; }
+
+.task-stats {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.task-admin-actions {
+    display: flex;
+    gap: 0.3rem;
+}
+
+.btn-xs {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Футер квеста */
+.quest-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f0f0f0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.quest-rewards {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.quest-rewards strong {
+    color: #2c3e50;
+    white-space: nowrap;
+}
+
+.quest-rewards span {
+    color: #666;
+    word-wrap: break-word;
+}
+
+/* Кнопки */
+.btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a6fd8, #6a42a0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-edit {
+    background: #ffc107;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #e0a800;
+    transform: scale(1.05);
+}
+
+.btn-stats {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-stats:hover {
+    background: #138496;
+    transform: scale(1.05);
+}
+
+.btn-users {
+    background: #6f42c1;
+    color: white;
+}
+
+.btn-users:hover {
+    background: #5e36a6;
+    transform: scale(1.05);
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+}
+
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.close {
+    font-size: 2rem;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.close:hover {
+    opacity: 0.7;
+}
+
+.modal-form {
+    padding: 2rem;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    background: #f8f9fa;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+}
+
+.form-group input[type="color"] {
+    height: 50px;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .quests-page {
+        padding: 1rem;
+    }
+    
+    .quests-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .admin-controls {
+        flex-direction: column;
+    }
+    
+    .quest-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .quest-icon {
+        align-self: center;
+    }
+    
+    .quest-meta {
+        justify-content: center;
+    }
+    
+    .quest-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .admin-quest-overlay {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    .quest-card {
+        padding: 1.5rem;
+    }
+    
+    .admin-panel {
+        padding: 1.5rem;
+    }
+    
+    .quest-user-badge {
+        position: relative;
+        top: auto;
+        right: auto;
+        align-self: flex-start;
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<script>
+// ========== ФУНКЦИИ ДЛЯ АДМИНИСТРАТОРОВ ==========
+function showAddQuestModal() {
+    document.getElementById('addQuestModal').style.display = 'block';
+}
+
+function closeAddQuestModal() {
+    document.getElementById('addQuestModal').style.display = 'none';
+}
+
+function showQuestStats(questId) {
+    // Загрузка реальной статистики
+    fetch(`/admin/quests/${questId}/stats`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('questStatsContent').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">${data.total_users}</div>
+                        <div class="stat-label">Всего участников</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${data.completed_users}</div>
+                        <div class="stat-label">Завершили квест</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${data.success_rate}%</div>
+                        <div class="stat-label">Успешных завершений</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${data.avg_completion_time}</div>
+                        <div class="stat-label">Среднее время</div>
+                    </div>
+                </div>
+                <div class="stats-details">
+                    <h4>Популярные задания:</h4>
+                    <ul>
+                        ${data.popular_tasks.map(task => `<li>${task}</li>`).join('')}
+                    </ul>
+                    <h4>Сложные задания:</h4>
+                    <ul>
+                        ${data.difficult_tasks.map(task => `<li>${task}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            document.getElementById('questStatsModal').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки статистики:', error);
+            showNotification('Ошибка загрузки статистики', 'error');
+        });
+}
+
+function closeQuestStatsModal() {
+    document.getElementById('questStatsModal').style.display = 'none';
+}
+
+function editQuest(questId) {
+    showNotification(`Редактирование квеста ${questId}`, 'info');
+    // В реальном приложении: window.location.href = `/admin/quests/${questId}/edit`;
+}
+
+function editTask(taskId) {
+    showNotification(`Редактирование задания ${taskId}`, 'info');
+    // В реальном приложении: window.location.href = `/admin/tasks/${taskId}/edit`;
+}
+
+function showQuestUsers(questId) {
+    showNotification(`Просмотр участников квеста ${questId}`, 'info');
+    // В реальном приложении: window.location.href = `/admin/quests/${questId}/users`;
+}
+
+function showUserProgressModal() {
+    showNotification('Открыта статистика прогресса пользователей', 'success');
+    // В реальном приложении: window.location.href = '/admin/quests/progress';
+}
+
+function exportQuestData() {
+    showNotification('Данные квестов экспортированы', 'success');
+    // В реальном приложении: window.location.href = '/admin/quests/export';
+}
+
+// ========== ФУНКЦИИ ДЛЯ ПОЛЬЗОВАТЕЛЕЙ ==========
+function continueQuest(questId) {
+    // Прямой переход без подтверждения
+    window.location.href = `/quest/${questId}`;
+}
+
+function openTask(taskUrl) {
+    // Прямой переход без подтверждения
+    window.location.href = taskUrl;
+}
+
+// ========== ОБРАБОТЧИКИ ФОРМ ==========
+document.getElementById('addQuestForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const questData = Object.fromEntries(formData);
+    
+    showNotification(`Квест "${questData.title}" создан успешно!`, 'success');
+    closeAddQuestModal();
+    
+    // В реальном приложении здесь будет AJAX запрос:
+    // fetch('/admin/quests/create', {
+    //     method: 'POST',
+    //     headers: {'Content-Type': 'application/json'},
+    //     body: JSON.stringify(questData)
+    // })
+});
+
+// ========== ОБЩИЕ ФУНКЦИИ ==========
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#667eea'};
+        color: white;
+        border-radius: 8px;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-weight: 500;
+        max-width: 300px;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Анимация появления
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Автоматическое скрытие
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Закрытие модальных окон
+window.addEventListener('click', function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+
+// Закрытие по ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.style.display = 'none';
+        });
+    }
+});
+
+// Анимация появления карточек
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.quest-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

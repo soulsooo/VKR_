@@ -1,0 +1,1346 @@
+{% extends "base.html" %}
+
+{% block title %}Оборудование - Лаборатория робототехники{% endblock %}
+
+{% block content %}
+<div class="equipment-catalog">
+    <!-- Заголовок и описание -->
+    <div class="catalog-header">
+        <h1>🔧 Каталог оборудования</h1>
+        <p class="catalog-description">Современное оборудование для исследований и разработок в области робототехники</p>
+    </div>
+
+    <!-- Фильтры по категориям -->
+    <div class="category-filters">
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-category="all">
+                <i class="fas fa-th-large"></i>
+                Все оборудование
+            </button>
+            <button class="filter-btn" data-category="workstation">
+                <i class="fas fa-desktop"></i>
+                Рабочие места
+            </button>
+            <button class="filter-btn" data-category="3d">
+                <i class="fas fa-print"></i>
+                3D-печать
+            </button>
+            <button class="filter-btn" data-category="robots">
+                <i class="fas fa-robot"></i>
+                Робоманипуляторы
+            </button>
+            <button class="filter-btn" data-category="drones">
+                <i class="fas fa-helicopter"></i>
+                БПЛА
+            </button>
+            <button class="filter-btn" data-category="cnc">
+                <i class="fas fa-cog"></i>
+                ЧПУ станки
+            </button>
+        </div>
+        
+        <!-- Поиск -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="equipmentSearch" placeholder="Поиск оборудования...">
+        </div>
+    </div>
+
+    <!-- Статистика -->
+    <div class="equipment-stats">
+        <div class="stat-card">
+            <div class="stat-icon available">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">8</span>
+                <span class="stat-label">Доступно</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon busy">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Занято</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon maintenance">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">1</span>
+                <span class="stat-label">Обслуживание</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Сетка оборудования -->
+    <div class="equipment-grid" id="equipmentGrid">
+        <!-- Рабочее место HP -->
+        <div class="equipment-card" data-category="workstation" data-name="рабочее место hp компьютер">
+            <div class="card-image">
+                <div class="category-badge workstation">
+                    <i class="fas fa-desktop"></i>
+                    Рабочее место
+                </div>
+                <img src="{{ url_for('static', filename='images/equipment/arm/workstation-hp.jpg') }}" 
+                     alt="Рабочее место HP" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="image-placeholder">
+                    <i class="fas fa-desktop"></i>
+                </div>
+                <div class="card-overlay">
+                    <div class="status-indicator available"></div>
+                    <!-- КНОПКА ИЗБРАННОГО -->
+                    <button class="favorite-btn" data-equipment-id="1">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="equipment-title">Рабочее место HP</h3>
+                <p class="equipment-description">Компьютерная рабочая станция для проектирования и программирования робототехнических систем</p>
+                
+                <div class="specs-preview">
+                    <div class="spec-tag">
+                        <i class="fas fa-microchip"></i>
+                        Intel Core i7
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-memory"></i>
+                        16GB RAM
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-hdd"></i>
+                        512GB SSD
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <a href="/booking" class="btn btn-primary btn-book">
+                        <i class="fas fa-calendar-plus"></i>
+                        Забронировать
+                    </a>
+                    <a href="{{ url_for('equipment_detail', equipment_id=1) }}" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i>
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D-принтер Designer XL Pro -->
+        <div class="equipment-card" data-category="3d" data-name="3d принтер designer xl pro">
+            <div class="card-image">
+                <div class="category-badge printing">
+                    <i class="fas fa-print"></i>
+                    3D-печать
+                </div>
+                <img src="{{ url_for('static', filename='images/equipment/3d-printing/3d-designer-xl.jpg') }}"
+                     alt="3D-принтер Designer XL Pro" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="image-placeholder">
+                    <i class="fas fa-print"></i>
+                </div>
+                <div class="card-overlay">
+                    <div class="status-indicator available"></div>
+                    <!-- КНОПКА ИЗБРАННОГО -->
+                    <button class="favorite-btn" data-equipment-id="2">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="equipment-title">3D-принтер Designer XL Pro</h3>
+                <p class="equipment-description">Профессиональный 3D-принтер для крупногабаритных моделей и прототипирования</p>
+                
+                <div class="specs-preview">
+                    <div class="spec-tag">
+                        <i class="fas fa-ruler-combined"></i>
+                        300×300×400mm
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-layer-group"></i>
+                        PLA, ABS, PETG
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-bolt"></i>
+                        Dual Extrusion
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <a href="/booking" class="btn btn-primary btn-book">
+                        <i class="fas fa-calendar-plus"></i>
+                        Забронировать
+                    </a>
+                    <a href="{{ url_for('equipment_detail', equipment_id=2) }}" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i>
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Робот KUKA KR 4 R600 -->
+        <div class="equipment-card" data-category="robots" data-name="робот kuka kr4 r600">
+            <div class="card-image">
+                <div class="category-badge robots">
+                    <i class="fas fa-robot"></i>
+                    Робоманипулятор
+                </div>
+                <img src="{{ url_for('static', filename='images/equipment/robots/robot-kuka-kr4.jpg') }}" 
+                     alt="Робот-манипулятор KUKA KR 4 R600" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="image-placeholder">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="card-overlay">
+                    <div class="status-indicator available"></div>
+                    <!-- КНОПКА ИЗБРАННОГО -->
+                    <button class="favorite-btn" data-equipment-id="3">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="equipment-title">KUKA KR 4 R600</h3>
+                <p class="equipment-description">Компактный 6-осевой промышленный робот для автоматизации и исследований</p>
+                
+                <div class="specs-preview">
+                    <div class="spec-tag">
+                        <i class="fas fa-weight-hanging"></i>
+                        4 кг
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-arrows-alt-h"></i>
+                        600 мм
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-bullseye"></i>
+                        ±0.03 мм
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <a href="/booking" class="btn btn-primary btn-book">
+                        <i class="fas fa-calendar-plus"></i>
+                        Забронировать
+                    </a>
+                    <a href="{{ url_for('equipment_detail', equipment_id=3) }}" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i>
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Коллаборативный робот LBR iiwa 7 R800 -->
+        <div class="equipment-card" data-category="robots" data-name="робот lbr iiwa r800">
+            <div class="card-image">
+                <div class="category-badge robots">
+                    <i class="fas fa-robot"></i>
+                    Робоманипулятор
+                </div>
+                <img src="{{ url_for('static', filename='images/equipment/robots/robot-lbr-iiwa.jpg') }}" 
+                     alt="Коллаборативный робот LBR iiwa 7 R800" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="image-placeholder">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="card-overlay">
+                    <div class="status-indicator busy"></div>
+                    <!-- КНОПКА ИЗБРАННОГО -->
+                    <button class="favorite-btn" data-equipment-id="4">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="equipment-title">LBR iiwa 7 R800</h3>
+                <p class="equipment-description">Чувствительный коллаборативный робот для совместной работы с оператором</p>
+                
+                <div class="specs-preview">
+                    <div class="spec-tag">
+                        <i class="fas fa-weight-hanging"></i>
+                        7 кг
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-arrows-alt-h"></i>
+                        800 мм
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-hand-paper"></i>
+                        Безопасный
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <button class="btn btn-primary btn-book" disabled>
+                        <i class="fas fa-clock"></i>
+                        Занято
+                    </button>
+                    <a href="{{ url_for('equipment_detail', equipment_id=4) }}" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i>
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Робот Hobots Pro -->
+        <div class="equipment-card" data-category="robots" data-name="робот hobots pro">
+            <div class="card-image">
+                <div class="category-badge robots">
+                    <i class="fas fa-robot"></i>
+                    Робоманипулятор
+                </div>
+                <img src="{{ url_for('static', filename='images/equipment/robots/robot-hobots.jpg') }}" 
+                     alt="Робот-манипулятор Hobots Pro" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="image-placeholder">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="card-overlay">
+                    <div class="status-indicator maintenance"></div>
+                    <!-- КНОПКА ИЗБРАННОГО -->
+                    <button class="favorite-btn" data-equipment-id="5">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="equipment-title">Hobots Pro</h3>
+                <p class="equipment-description">Шестиосевой коллаборативный робот-манипулятор для исследовательских задач</p>
+                
+                <div class="specs-preview">
+                    <div class="spec-tag">
+                        <i class="fas fa-weight-hanging"></i>
+                        5 кг
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-arrows-alt-h"></i>
+                        900 мм
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-bolt"></i>
+                        Torque Sensing
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <button class="btn btn-primary btn-book" disabled>
+                        <i class="fas fa-tools"></i>
+                        Обслуживание
+                    </button>
+                    <a href="{{ url_for('equipment_detail', equipment_id=5) }}" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i>
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Дрон Iflight Quadcopter -->
+        <div class="equipment-card" data-category="drones" data-name="дрон iflight quadcopter">
+            <div class="card-image">
+                <div class="category-badge drones">
+                    <i class="fas fa-helicopter"></i>
+                    БПЛА
+                </div>
+                <img src="{{ url_for('static', filename='images/equipment/drones/drone-iflight.jpg') }}"  
+                     alt="Дрон Iflight Quadcopter" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="image-placeholder">
+                    <i class="fas fa-helicopter"></i>
+                </div>
+                <div class="card-overlay">
+                    <div class="status-indicator available"></div>
+                    <!-- КНОПКА ИЗБРАННОГО -->
+                    <button class="favorite-btn" data-equipment-id="6">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="equipment-title">Iflight Quadcopter</h3>
+                <p class="equipment-description">4-осевой складной коптер из углеродного волокна со встроенным PCB</p>
+                
+                <div class="specs-preview">
+                    <div class="spec-tag">
+                        <i class="fas fa-compress-alt"></i>
+                        Складной
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-atom"></i>
+                        Углеродное волокно
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-microchip"></i>
+                        Встроенный PCB
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <a href="/booking" class="btn btn-primary btn-book">
+                        <i class="fas fa-calendar-plus"></i>
+                        Забронировать
+                    </a>
+                    <a href="{{ url_for('equipment_detail', equipment_id=6) }}" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i>
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Дрон ZOHD Dart250G -->
+        <div class="equipment-card" data-category="drones" data-name="дрон zohd dart250g">
+            <div class="card-image">
+                <div class="category-badge drones">
+                    <i class="fas fa-plane"></i>
+                    БПЛА
+                </div>
+                <img src="{{ url_for('static', filename='images/equipment/drones/drone-zohd.jpg') }}" 
+                     alt="Дрон ZOHD Dart250G" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="image-placeholder">
+                    <i class="fas fa-plane"></i>
+                </div>
+                <div class="card-overlay">
+                    <div class="status-indicator available"></div>
+                    <!-- КНОПКА ИЗБРАННОГО -->
+                    <button class="favorite-btn" data-equipment-id="7">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="equipment-title">ZOHD Dart250G</h3>
+                <p class="equipment-description">Самолетный БПЛА с размахом крыльев 570 мм, вес менее 250 грамм</p>
+                
+                <div class="specs-preview">
+                    <div class="spec-tag">
+                        <i class="fas fa-ruler"></i>
+                        570 мм
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-weight"></i>
+                        <250 г
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-rocket"></i>
+                        Стреловидный
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <a href="/booking" class="btn btn-primary btn-book">
+                        <i class="fas fa-calendar-plus"></i>
+                        Забронировать
+                    </a>
+                    <a href="{{ url_for('equipment_detail', equipment_id=7) }}" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i>
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЧПУ станок ЗУБР -->
+        <div class="equipment-card" data-category="cnc" data-name="чпу станок зубр зптк">
+            <div class="card-image">
+                <div class="category-badge cnc">
+                    <i class="fas fa-cog"></i>
+                    ЧПУ станок
+                </div>
+                <img src="{{ url_for('static', filename='images/equipment/cnc/cnc-zubr.jpg') }}" 
+                     alt="ЧПУ станок ЗУБР ЗПТК-210-1500" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="image-placeholder">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="card-overlay">
+                    <div class="status-indicator available"></div>
+                    <!-- КНОПКА ИЗБРАННОГО -->
+                    <button class="favorite-btn" data-equipment-id="8">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="equipment-title">ЗУБР ЗПТК-210-1500</h3>
+                <p class="equipment-description">Торцовочная комбинированная пила с ЧПУ для точной обработки материалов</p>
+                
+                <div class="specs-preview">
+                    <div class="spec-tag">
+                        <i class="fas fa-ruler"></i>
+                        Ø210 мм
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-bolt"></i>
+                        1500 Вт
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-compass"></i>
+                        Торцовочная
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <a href="/booking" class="btn btn-primary btn-book">
+                        <i class="fas fa-calendar-plus"></i>
+                        Забронировать
+                    </a>
+                    <a href="{{ url_for('equipment_detail', equipment_id=8) }}" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i>
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сверлильно-фрезерный станок VM18L -->
+        <div class="equipment-card" data-category="cnc" data-name="станок vm18l сверлильно фрезерный">
+            <div class="card-image">
+                <div class="category-badge cnc">
+                    <i class="fas fa-tools"></i>
+                    ЧПУ станок
+                </div>
+                <img src="{{ url_for('static', filename='images/equipment/cnc/cnc-vm18l.jpg') }}" 
+                     alt="Сверлильно-фрезерный станок VM18L" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="image-placeholder">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="card-overlay">
+                    <div class="status-indicator busy"></div>
+                    <!-- КНОПКА ИЗБРАННОГО -->
+                    <button class="favorite-btn" data-equipment-id="9">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3 class="equipment-title">VM18L Сверлильно-фрезерный</h3>
+                <p class="equipment-description">Многофункциональный цифровой станок с бесступенчатой регулировкой скорости</p>
+                
+                <div class="specs-preview">
+                    <div class="spec-tag">
+                        <i class="fas fa-digital-tachograph"></i>
+                        Цифровой
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-sliders-h"></i>
+                        Бесступенчатый
+                    </div>
+                    <div class="spec-tag">
+                        <i class="fas fa-arrows-alt"></i>
+                        Многофункциональный
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <button class="btn btn-primary btn-book" disabled>
+                        <i class="fas fa-clock"></i>
+                        Занято
+                    </button>
+                    <a href="{{ url_for('equipment_detail', equipment_id=9) }}" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i>
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.equipment-catalog {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.catalog-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.catalog-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.catalog-description {
+    font-size: 1.1rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.category-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #666;
+}
+
+.filter-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: #667eea;
+    color: white;
+}
+
+.search-box {
+    position: relative;
+    min-width: 300px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 50px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.equipment-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.stat-icon.available {
+    background: #e8f5e8;
+    color: #28a745;
+}
+
+.stat-icon.busy {
+    background: #ffe8e8;
+    color: #dc3545;
+}
+
+.stat-icon.maintenance {
+    background: #fff3cd;
+    color: #ffc107;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    display: block;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 2rem;
+}
+
+.equipment-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.equipment-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+.card-image {
+    position: relative;
+    height: 200px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.category-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.2);
+}
+
+.category-badge.workstation { background: rgba(102, 126, 234, 0.9); }
+.category-badge.printing { background: rgba(40, 167, 69, 0.9); }
+.category-badge.robots { background: rgba(255, 193, 7, 0.9); }
+.category-badge.drones { background: rgba(0, 123, 255, 0.9); }
+.category-badge.cnc { background: rgba(108, 117, 125, 0.9); }
+
+.image-placeholder {
+    font-size: 4rem;
+    color: rgba(255,255,255,0.9);
+    display: none;
+}
+
+/* ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ CARD-OVERLAY */
+.card-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.status-indicator.available { background: #28a745; }
+.status-indicator.busy { background: #dc3545; }
+.status-indicator.maintenance { background: #ffc107; }
+
+/* СТИЛИ ДЛЯ КНОПКИ ИЗБРАННОГО */
+.favorite-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #dc3545;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.favorite-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.favorite-btn.favorited {
+    color: #dc3545;
+    background: white;
+}
+
+.favorite-btn.favorited i {
+    font-weight: 900;
+}
+
+.favorite-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.equipment-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    color: #2c3e50;
+    line-height: 1.3;
+}
+
+.equipment-description {
+    color: #666;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.specs-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.spec-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    background: #f8f9fa;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+.spec-tag i {
+    font-size: 0.7rem;
+    color: #667eea;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-book {
+    flex: 2;
+    justify-content: center;
+}
+
+.btn-outline {
+    flex: 1;
+    background: transparent;
+    border: 2px solid #667eea;
+    color: #667eea;
+    justify-content: center;
+}
+
+.btn-outline:hover {
+    background: #667eea;
+    color: white;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .category-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-buttons {
+        justify-content: center;
+    }
+    
+    .search-box {
+        min-width: auto;
+    }
+    
+    .equipment-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .equipment-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .card-overlay {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    
+    .favorite-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const equipmentCards = document.querySelectorAll('.equipment-card');
+    const searchInput = document.getElementById('equipmentSearch');
+    
+    // Фильтрация по категориям
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const category = this.getAttribute('data-category');
+            
+            // Обновляем активную кнопку
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Фильтруем карточки
+            filterEquipment(category, searchInput.value.toLowerCase());
+        });
+    });
+    
+    // Поиск
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const activeCategory = document.querySelector('.filter-btn.active').getAttribute('data-category');
+        filterEquipment(activeCategory, searchTerm);
+    });
+    
+    function filterEquipment(category, searchTerm) {
+        equipmentCards.forEach(card => {
+            const cardCategory = card.getAttribute('data-category');
+            const cardName = card.getAttribute('data-name').toLowerCase();
+            const cardText = card.textContent.toLowerCase();
+            
+            const categoryMatch = category === 'all' || cardCategory === category;
+            const searchMatch = searchTerm === '' || cardName.includes(searchTerm) || cardText.includes(searchTerm);
+            
+            if (categoryMatch && searchMatch) {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            } else {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.display = 'none';
+                }, 300);
+            }
+        });
+    }
+    
+    // Анимация появления карточек
+    equipmentCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+<!-- Подключаем наш API -->
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+
+<script>
+// Дополнительный функционал с API
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Equipment API подключен!');
+    
+    // Добавляем кнопку для тестирования API
+    addUsefulFeatures()
+    
+    // Обновляем статистику через API
+    updateStatsFromAPI();
+    
+    // Загружаем состояние избранного
+    loadFavoriteStates();
+});
+
+// Функция для добавления полезных функций 
+function addUsefulFeatures() {
+    // Добавляем обработчик живого поиска
+    setupLiveSearch();
+}
+
+// Настраиваем живой поиск через API
+function setupLiveSearch() {
+    const searchInput = document.getElementById('equipmentSearch');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const searchTerm = this.value.trim();
+            
+            if (searchTerm.length > 2) {
+                performLiveSearch(searchTerm);
+            } else if (searchTerm.length === 0) {
+                // Если поиск очищен, показываем все оборудование
+                showAllEquipment();
+            }
+        }, 300); // Задержка 300мс
+    });
+}
+
+// Выполняем живой поиск через API
+async function performLiveSearch(searchTerm) {
+    try {
+        showNotification(`🔍 Ищем: "${searchTerm}"...`, 'info');
+        
+        const equipment = await equipmentAPI.searchEquipment(searchTerm);
+        
+        // Скрываем все карточки
+        document.querySelectorAll('.equipment-card').forEach(card => {
+            card.style.display = 'none';
+        });
+        
+        // Показываем только найденные
+        equipment.forEach(item => {
+            const card = document.querySelector(`[data-name*="${item.name.toLowerCase()}"]`);
+            if (card) {
+                card.style.display = 'block';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50);
+            }
+        });
+        
+        showNotification(`✅ Найдено: ${equipment.length} единиц оборудования`, 'success');
+        
+    } catch (error) {
+        console.error('Ошибка поиска:', error);
+        showNotification('❌ Ошибка поиска', 'error');
+    }
+}
+
+// Показываем все оборудование
+function showAllEquipment() {
+    document.querySelectorAll('.equipment-card').forEach(card => {
+        card.style.display = 'block';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    });
+}
+
+// Функция для тестирования API
+async function testEquipmentAPI() {
+    console.log('🧪 Тестируем API...');
+    
+    try {
+        const equipment = await equipmentAPI.getAllEquipment();
+        const categories = await equipmentAPI.getCategories();
+        
+        console.log('✅ API работает! Загружено:', {
+            equipment: equipment.length,
+            categories: categories.length
+        });
+        
+        // Показываем уведомление
+        showNotification(`✅ API работает! Оборудование: ${equipment.length}, Категории: ${categories.length}`, 'success');
+        
+    } catch (error) {
+        console.error('❌ Ошибка API:', error);
+        showNotification(`❌ Ошибка API: ${error.message}`, 'error');
+    }
+}
+
+// Функция для обновления статистики через API
+async function updateStatsFromAPI() {
+    try {
+        const equipment = await equipmentAPI.getAllEquipment();
+        
+        const available = equipment.filter(item => item.is_available).length;
+        const busy = equipment.filter(item => !item.is_available).length;
+        
+        // Обновляем цифры в статистике
+        const statNumbers = document.querySelectorAll('.stat-number');
+        if (statNumbers[0]) statNumbers[0].textContent = available;
+        if (statNumbers[1]) statNumbers[1].textContent = busy;
+        
+    } catch (error) {
+        console.log('Не удалось обновить статистику через API, используем статические данные');
+    }
+}
+
+// Функция для загрузки состояния избранного
+async function loadFavoriteStates() {
+    try {
+        const response = await fetch('/api/user/favorites');
+        const data = await response.json();
+        
+        if (data.success) {
+            // Для каждого оборудования проверяем, есть ли оно в избранном
+            document.querySelectorAll('.favorite-btn').forEach(button => {
+                const equipmentId = button.dataset.equipmentId;
+                const isFavorited = data.favorites.some(fav => fav.id == equipmentId);
+                
+                if (isFavorited) {
+                    button.innerHTML = '<i class="fas fa-heart"></i>';
+                    button.classList.add('favorited');
+                } else {
+                    button.innerHTML = '<i class="far fa-heart"></i>';
+                    button.classList.remove('favorited');
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading favorite states:', error);
+    }
+}
+
+// Функция для переключения избранного
+async function toggleFavorite(equipmentId, button) {
+    try {
+        // Показываем состояние загрузки
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        // Определяем метод (добавить или удалить)
+        const isCurrentlyFavorited = button.classList.contains('favorited');
+        const method = isCurrentlyFavorited ? 'DELETE' : 'POST';
+        
+        const response = await fetch(`/api/equipment/${equipmentId}/favorite`, {
+            method: method
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            if (result.favorited) {
+                // Добавили в избранное
+                button.innerHTML = '<i class="fas fa-heart"></i>';
+                button.classList.add('favorited');
+                showNotification('❤️ Добавлено в избранное', 'success');
+            } else {
+                // Удалили из избранного
+                button.innerHTML = '<i class="far fa-heart"></i>';
+                button.classList.remove('favorited');
+                showNotification('Удалено из избранного', 'info');
+            }
+            
+            // Анимация
+            button.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 200);
+            
+        } else {
+            showNotification('Ошибка: ' + result.error, 'error');
+        }
+        
+    } catch (error) {
+        console.error('Toggle favorite error:', error);
+        showNotification('Ошибка обновления избранного', 'error');
+    } finally {
+        button.disabled = false;
+    }
+}
+
+// Добавляем обработчики клика на кнопки избранного
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.favorite-btn')) {
+        const button = e.target.closest('.favorite-btn');
+        const equipmentId = button.dataset.equipmentId;
+        toggleFavorite(equipmentId, button);
+    }
+});
+
+// Функция для показа уведомлений
+function showNotification(message, type = 'info') {
+    // Создаем элемент уведомления
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 10000;
+        max-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+    `;
+    
+    if (type === 'success') {
+        notification.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+    } else if (type === 'error') {
+        notification.style.background = 'linear-gradient(135deg, #dc3545, #e83e8c)';
+    } else {
+        notification.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Анимация появления
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Автоматическое скрытие
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
+}
+
+// Расширенная функция для динамической загрузки оборудования
+async function loadEquipmentDynamic() {
+    try {
+        const equipment = await equipmentAPI.getAllEquipment();
+        const grid = document.getElementById('equipmentGrid');
+        
+        console.log('📦 Динамически загружено оборудование:', equipment);
+        showNotification(`📦 Загружено ${equipment.length} единиц оборудования через API`, 'success');
+        
+    } catch (error) {
+        console.error('Ошибка загрузки оборудования:', error);
+        showNotification('❌ Ошибка загрузки оборудования', 'error');
+    }
+}
+</script>
+
+<style>
+/* Дополнительные стили для API функциональности */
+.btn-api-test:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+.api-test-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+}
+
+.api-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.api-controls button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.api-controls .btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.api-controls .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.api-controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#api-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.equipment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.equipment-item {
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #667eea;
+}
+</style>
+{% endblock %}

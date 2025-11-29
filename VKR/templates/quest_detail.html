@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+{% block title %}Квест - Лаборатория робототехники{% endblock %}
+
+{% block content %}
+<div class="quest-detail-container">
+    <!-- Заголовок квеста -->
+    <div class="card">
+        <div class="quest-header">
+            <div class="quest-icon-large" style="background: #4CAF50;">
+                🖨️
+            </div>
+            <div class="quest-title-info">
+                <h1>Основы 3D-печати</h1>
+                <p class="quest-description">Изучите принципы работы 3D-принтера и создайте свою первую модель</p>
+                <div class="quest-meta">
+                    <span class="quest-difficulty difficulty-beginner">
+                        Начальный
+                    </span>
+                    <span class="quest-reward">
+                        <i class="fas fa-star"></i> 100 опыта
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Прогресс квеста -->
+        <div class="quest-progress">
+            <div class="progress-info">
+                <span>Общий прогресс: 75%</span>
+                <span>3/4 заданий</span>
+            </div>
+            <div class="progress-bar-large">
+                <div class="progress-fill" style="width: 75%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Список заданий -->
+    <div class="tasks-section">
+        <h2>Задания квеста</h2>
+        <div class="tasks-list">
+            <!-- Задание 1 -->
+            <div class="task-item completed">
+                <div class="task-checkbox">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="task-content">
+                    <h3>Основы 3D-печати</h3>
+                    <p>Изучите теоретические основы технологии FDM печати и виды материалов</p>
+                    <div class="task-meta">
+                        <span class="task-type type-reading">
+                            <i class="fas fa-book"></i> Чтение
+                        </span>
+                        <span class="task-duration">
+                            <i class="fas fa-clock"></i> 20 мин
+                        </span>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <a href="/quest/1/task/1" class="btn btn-secondary btn-small">
+                        <i class="fas fa-eye"></i> Просмотреть
+                    </a>
+                </div>
+            </div>
+
+            <!-- Задание 2 -->
+            <div class="task-item completed">
+                <div class="task-checkbox">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="task-content">
+                    <h3>Тест по безопасности</h3>
+                    <p>Пройдите тест по технике безопасности при работе с 3D-принтерами</p>
+                    <div class="task-meta">
+                        <span class="task-type type-quiz">
+                            <i class="fas fa-question"></i> Тест
+                        </span>
+                        <span class="task-duration">
+                            <i class="fas fa-clock"></i> 10 мин
+                        </span>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <a href="/quest/1/task/2" class="btn btn-secondary btn-small">
+                        <i class="fas fa-eye"></i> Просмотреть
+                    </a>
+                </div>
+            </div>
+
+            <!-- Задание 3 -->
+            <div class="task-item completed">
+                <div class="task-checkbox">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="task-content">
+                    <h3>Подготовка модели</h3>
+                    <p>Научитесь подготавливать 3D-модели для печати в слайсере</p>
+                    <div class="task-meta">
+                        <span class="task-type type-reading">
+                            <i class="fas fa-book"></i> Чтение
+                        </span>
+                        <span class="task-duration">
+                            <i class="fas fa-clock"></i> 25 мин
+                        </span>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <a href="/quest/1/task/3" class="btn btn-secondary btn-small">
+                        <i class="fas fa-eye"></i> Просмотреть
+                    </a>
+                </div>
+            </div>
+
+            <!-- Задание 4 -->
+            <div class="task-item">
+                <div class="task-checkbox">
+                    <i class="far fa-circle"></i>
+                </div>
+                <div class="task-content">
+                    <h3>Практическое задание</h3>
+                    <p>Создайте и распечатайте свою первую 3D-модель под наблюдением инструктора</p>
+                    <div class="task-meta">
+                        <span class="task-type type-practical">
+                            <i class="fas fa-wrench"></i> Практика
+                        </span>
+                        <span class="task-duration">
+                            <i class="fas fa-clock"></i> 45 мин
+                        </span>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <a href="/quest/1/task/4" class="btn btn-primary btn-small">
+                        Начать практику
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <div class="quest-navigation">
+        <a href="/quests" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к квестам
+        </a>
+        <button class="btn btn-success" onclick="showCompletionMessage()">
+            <i class="fas fa-gift"></i> Получить награду
+        </button>
+    </div>
+</div>
+
+<style>
+/* Стили остаются такими же как в предыдущем коде */
+.quest-detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.quest-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    margin-bottom: 2rem;
+}
+
+.quest-icon-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.quest-title-info h1 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+.quest-description {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.quest-meta {
+    display: flex;
+    gap: 1rem;
+}
+
+.quest-difficulty {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.difficulty-beginner {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.difficulty-intermediate {
+    background: #E3F2FD;
+    color: #1565C0;
+}
+
+.difficulty-advanced {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+.quest-reward {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #FFD700;
+    font-weight: 600;
+}
+
+.quest-progress {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.progress-bar-large {
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+
+.tasks-section h2 {
+    margin: 2rem 0 1rem 0;
+    color: #333;
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.task-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    align-items: center;
+}
+
+.task-item.completed {
+    background: #f8fff8;
+    border-left: 4px solid #4CAF50;
+}
+
+.task-checkbox {
+    font-size: 1.5rem;
+}
+
+.task-item.completed .task-checkbox {
+    color: #4CAF50;
+}
+
+.task-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+.task-content p {
+    margin: 0 0 0.5rem 0;
+    color: #666;
+}
+
+.task-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+}
+
+.task-type {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    background: #f0f0f0;
+}
+
+.type-video { background: #FFEBEE; color: #C62828; }
+.type-quiz { background: #E3F2FD; color: #1565C0; }
+.type-reading { background: #E8F5E9; color: #2E7D32; }
+.type-practical { background: #FFF3E0; color: #EF6C00; }
+
+.task-duration {
+    color: #666;
+}
+
+.task-completed {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.quest-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>
+
+<script>
+function showCompletionMessage() {
+    const progress = parseInt(document.querySelector('.progress-fill').style.width);
+    if (progress === 100) {
+        alert('🎉 Поздравляем! Вы завершили квест "Основы 3D-печати" и получаете 100 опыта!');
+        setTimeout(() => {
+            window.location.href = '/quests';
+        }, 2000);
+    } else {
+        alert('Завершите все задания квеста для получения награды!');
+    }
+}
+</script>
+{% endblock %}
